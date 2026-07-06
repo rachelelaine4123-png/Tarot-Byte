@@ -1,49 +1,160 @@
+/* TarotByte — Global Styles
+   Aesthetic: dark cosmic × adult-cartoon × steampunk tech
+   Deep space navy/black, brass & gold, copper accents, glowing arcane cyan. */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-deep: #0a0913;
+  --bg-panel: #14121f;
+  --bg-panel-2: #1c1930;
+  --ink: #ece7f5;
+  --ink-dim: #a89fc4;
+  --brass: #d4a24c;
+  --brass-bright: #f0c674;
+  --copper: #b5763f;
+  --arcane: #5ce1e6;      /* glowing cyan for tech/energy */
+  --arcane-dim: #2b6e72;
+  --plum: #6d3f8f;
+  --rose: #d98ca8;
+  --border: #2e2a44;
+  --shadow: rgba(0, 0, 0, 0.55);
+  --glow-brass: 0 0 18px rgba(240, 198, 116, 0.35);
+  --glow-arcane: 0 0 22px rgba(92, 225, 230, 0.35);
+  --font-display: "Cinzel", Georgia, "Times New Roman", serif;
+  --font-body: "Spectral", Georgia, serif;
+  --font-ui: "Inter", system-ui, -apple-system, sans-serif;
+  --radius: 14px;
+  --maxw: 1120px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-html {
-  height: 100%;
-}
+html { scroll-behavior: smooth; }
 
-html,
 body {
-  max-width: 100vw;
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(109, 63, 143, 0.25), transparent 60%),
+    radial-gradient(900px 500px at 10% 10%, rgba(92, 225, 230, 0.08), transparent 55%),
+    var(--bg-deep);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.65;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
 
-body {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* Subtle starfield overlay */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(1.5px 1.5px at 20% 30%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1px 1px at 60% 70%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1.5px 1.5px at 80% 20%, rgba(240,198,116,0.6), transparent),
+    radial-gradient(1px 1px at 40% 80%, rgba(92,225,230,0.5), transparent),
+    radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,0.4), transparent);
+  background-size: 100% 100%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.7;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+  color: var(--ink);
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+a { color: var(--brass-bright); text-decoration: none; }
+a:hover { color: var(--arcane); }
+
+.container { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+/* Buttons */
+.btn {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.03em;
+  padding: 0.85rem 1.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--brass);
+  background: linear-gradient(180deg, var(--brass-bright), var(--brass));
+  color: #1a1408;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: var(--glow-brass); filter: brightness(1.05); }
+.btn:active { transform: translateY(0); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--arcane);
+  border: 1px solid var(--arcane-dim);
+}
+.btn-ghost:hover { box-shadow: var(--glow-arcane); border-color: var(--arcane); color: var(--arcane); }
+
+.btn-lg { padding: 1.05rem 2.2rem; font-size: 1.05rem; }
+
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* Panels / cards */
+.panel {
+  background: linear-gradient(180deg, var(--bg-panel-2), var(--bg-panel));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 40px var(--shadow);
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+.eyebrow {
+  font-family: var(--font-ui);
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  font-size: 0.72rem;
+  color: var(--arcane);
+  font-weight: 600;
 }
+
+.gold-text {
+  background: linear-gradient(90deg, var(--brass-bright), var(--brass), var(--rose));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Divider with gear motif feel */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--brass), transparent);
+  margin: 3rem 0;
+  opacity: 0.5;
+}
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% { opacity: 0.55; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-6px); }
+}
+@keyframes float {
+  0% { opacity: 0; transform: translateY(16px) rotateY(90deg); }
+  100% { opacity: 1; transform: translateY(0) rotateY(0); }
+}
+@keyframes fadeUp {
+  0% { opacity: 0; transform: translateY(24px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Utility */
+.center { text-align: center; }
+.muted { color: var(--ink-dim); }
+.grid { display: grid; gap: 1.5rem; }
+.stack { display: flex; flex-direction: column; gap: 1rem; }
+
+/* Tier ladder hover tooltip */
+button:hover > .tier-tip { opacity: 1 !important; visibility: visible !important; }
