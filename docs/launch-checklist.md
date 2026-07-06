@@ -19,16 +19,21 @@ Legend: 💰 cost · ⏱ effort · 👤 you · 🤖 me (agent can do it) · 🤝
   4. Commit early, commit often. Every feature = a commit.
 - **Gotcha:** never commit secret keys (Stripe/Supabase/API keys). We'll use `.env.local` which `.gitignore` excludes automatically.
 
-### 2. 👤 Domain — secure tarotbyte.io
+### ✅ DONE: GitHub repo is live
+Repo: `rachelelaine4123-png/TarotByte` (public, `main` branch). Full app + docs + `.env.example` pushed. App converted off static-export to Vercel-native config.
+
+> **⚠️ Note on the .app domain:** `.app` is a Google-run TLD that is on the **HSTS preload list** — it *requires* HTTPS for every visitor, always. This is a good thing (secure by default, looks professional) and Vercel provides the SSL cert automatically. Just be aware: there is no "http://" version — it's HTTPS-only. No action needed; it just works once DNS points at Vercel.
+
+### 2. ✅ DONE: Domain — secured tarotbyte.app
 - **What for:** your brand address; also needed before email + Stripe look legit.
 - **💰** ~**$35–$45/year** for `.io` (it's pricier than `.com`). Budget-friendly alt: `.co` (~$30) or grab `tarotbyte.com` too if available (~$12) and redirect.
 - **⏱** 20 min.
 - **Where:** Cloudflare Registrar (at-cost, no markup, free privacy) is the best value. Namecheap and Porkbun are also good.
 - **Steps:**
-  1. 👤 Search + buy `tarotbyte.io`.
+  1. 👤 Search + buy `tarotbyte.app`.
   2. 👤 Turn ON WHOIS privacy (free at Cloudflare/Porkbun).
   3. 👤 Leave DNS at the registrar for now; we point it at Vercel in Phase B.
-- **Recommendation:** buy `tarotbyte.io` (your pick) **and** `tarotbyte.com` if free — cheap insurance against a copycat, and .com forwards to .io.
+- **Recommendation:** buy `tarotbyte.app` (your pick) **and** `tarotbyte.com` if free — cheap insurance against a copycat, and .com forwards to .io.
 
 ### 3. 🤖 Move the app to a real Next.js hosting target
 - **What for:** the current build is a *static export* (great for the demo). To do logins, payments, and AI narration you need **server-side** capability. Vercel runs Next.js natively (they make Next.js).
@@ -51,11 +56,11 @@ Legend: 💰 cost · ⏱ effort · 👤 you · 🤖 me (agent can do it) · 🤝
   3. You immediately get a `tarotbyte.vercel.app` URL that redeploys on every push.
 - **Gotcha:** environment variables (keys) get added in Vercel's dashboard, NOT in the repo. I'll give you the exact list of names to paste.
 
-### 5. 👤🤝 Point tarotbyte.io at Vercel
+### 5. 👤🤝 Point tarotbyte.app at Vercel
 - **What for:** your real domain serves the app with HTTPS.
 - **⏱** 20 min + DNS propagation (minutes to a few hours).
 - **Steps:**
-  1. 👤 In Vercel → Project → Settings → Domains → add `tarotbyte.io` and `www.tarotbyte.io`.
+  1. 👤 In Vercel → Project → Settings → Domains → add `tarotbyte.app` and `www.tarotbyte.app`.
   2. 👤 Vercel shows you 1–2 DNS records to add at your registrar (an A record or CNAME). Copy them into Cloudflare/registrar DNS.
   3. SSL is automatic + free once DNS resolves.
 
@@ -118,7 +123,7 @@ Legend: 💰 cost · ⏱ effort · 👤 you · 🤖 me (agent can do it) · 🤝
 - **⏱** 1–2 hrs.
 - **Steps:**
   1. 👤 Pick one (Resend for transactional; add Beehiiv/Buttondown later for the newsletter proper).
-  2. 👤 Verify your domain (add DNS records at registrar) so emails come from `hello@tarotbyte.io` and don't hit spam.
+  2. 👤 Verify your domain (add DNS records at registrar) so emails come from `hello@tarotbyte.app` and don't hit spam.
   3. 🤖 I wire the newsletter signup checkbox to the provider's API and set up auth email templates.
 - **Gotcha:** domain verification (SPF/DKIM DNS records) is the step people skip — without it your email lands in spam. Takes 15 min + propagation.
 
@@ -161,7 +166,7 @@ Legend: 💰 cost · ⏱ effort · 👤 you · 🤖 me (agent can do it) · 🤝
 | Item | Cost to start | Ongoing |
 |---|---|---|
 | Git / GitHub | Free | Free |
-| Domain (tarotbyte.io) | ~$40/yr | ~$40/yr |
+| Domain (tarotbyte.app) | ~$40/yr | ~$40/yr |
 | Vercel hosting | Free (Hobby) | $0 (until you scale) |
 | Supabase | Free | $0 (until you scale) |
 | Stripe | Free | 2.9% + $0.30 per charge |
