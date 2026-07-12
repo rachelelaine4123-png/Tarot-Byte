@@ -153,7 +153,7 @@ SCENE: a multigenerational family beneath an arch of ten glowing pentacles befor
 ---
 
 ## Bonus: the 12 sign "cover" cards (optional, later)
-If you want a header image per zodiac sign (for the Celestial layer, not the decans), reuse the STYLE BLOCK and just describe the sign's symbol as a luminous celestial emblem (e.g. "SCENE: a radiant golden scorpion constellation coiled over deep cosmic water, arcane cyan glow"). You already have the 12 Radiant Oracle cards, so this is only if you want a second set.
+If you want a header image per zodiac sign (for the Celestial layer, not the decans), reuse the STYLE BLOCK and just describe the sign's symbol as a luminous celestial emblem (e.g. "SCENE: a radiant golden scorpion constellation coiled over deep cosmic water, arcane cyan glow"). You already have the 12 Astral Threads cards, so this is only if you want a second set.
 
 ## Production tip
 Do them in **suit batches** (all Wands, then all Cups…) in one Canva session — the model stays more consistent within a session, and the four suits naturally cluster by palette (fire=warm gold/red, water=cool blue/teal, air=pale/violet, earth=amber/green over your navy base).

@@ -18,9 +18,9 @@ The **Decan Engine** maps each of the 36 numbered pip cards to one of the 36 zod
 
 ## Features
 - Two free readings: **Yes/No** and **3-card Past · Present · Future** (Love / Fortune / Career focus)
-- Signature **Energy Reading** (You · Current Energy · Outcome) clarified by an original **Radiant Oracle** card
+- Signature **Energy Reading** (You · Current Energy · Outcome) clarified by an original **Astral Threads** card
 - **The Weekly Byte** newsletter signup
-- Original 12-sign Radiant Oracle deck (100% original IP)
+- Original 12-sign Astral Threads deck (100% original IP)
 - 36 named decans (original TarotByte IP)
 
 ## Tech Stack
@@ -36,11 +36,11 @@ The **Decan Engine** maps each of the 36 numbered pip cards to one of the 36 zod
 app/                 # Next.js App Router pages
   components/         # Reading.js, Nav.js
   readings/[spread]/  # dynamic reading pages (yes-no, past-present-future, energy-reading)
-  oracle/             # Radiant Oracle showcase
+  oracle/             # Astral Threads showcase
   signup/             # member signup flow
 lib/
   tarotDeck.js         # 78-card Rider–Waite–Smith deck data
-  oracleDeck.js        # 12 original Radiant Oracle cards
+  oracleDeck.js        # 12 original Astral Threads cards
   celestial.js         # 36-decan lookup + celestial correspondence engine
   celestialNarrative.js# decan names, meanings, amplified-vs-precise narrative
   readingEngine.js     # shuffle, draw, spread logic, tier assembly

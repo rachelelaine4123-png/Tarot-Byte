@@ -17,7 +17,7 @@ export default function Nav() {
       </Link>
       <div style={{ display: "flex", gap: "1.5rem", alignItems: "center", fontFamily: "var(--font-ui)", fontSize: "0.92rem" }}>
         <Link href="/readings" className="muted">Readings</Link>
-        <Link href="/oracle" className="muted">The Oracle</Link>
+        <Link href="/oracle" className="muted">Astral Threads</Link>
         <Link href="/readings/energy-reading" className="muted" style={{ fontSize: "0.9rem" }}>
           Energy Reading
         </Link>

@@ -16,7 +16,7 @@ export default function Home() {
         </h1>
         <p className="muted" style={{ fontSize: "1.2rem", maxWidth: 620, margin: "0 auto 2rem", animation: "fadeUp 0.8s ease 0.1s both" }}>
           TarotByte pairs the timeless 78-card tarot with an original,
-          astrology-powered <strong style={{ color: "var(--arcane)" }}>Radiant Oracle</strong> —
+          astrology-powered <strong style={{ color: "var(--arcane)" }}>Astral Threads</strong> —
           for readings that feel personal, clarifying, and a little bit magic.
         </p>
         <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap", animation: "fadeUp 0.9s ease 0.15s both" }}>
@@ -85,18 +85,18 @@ export default function Home() {
             <div className="eyebrow">The TarotByte difference</div>
             <h2 style={{ fontSize: "2rem", margin: "0.5rem 0 1rem" }}>An oracle that&apos;s truly ours</h2>
             <p className="muted" style={{ marginBottom: "1rem" }}>
-              Most tarot sites stop at the cards. TarotByte layers in the <strong style={{ color: "var(--arcane)" }}>Radiant Oracle</strong> —
+              Most tarot sites stop at the cards. TarotByte layers in the <strong style={{ color: "var(--arcane)" }}>Astral Threads</strong> —
               an original 12-sign celestial deck that clarifies the energy behind every reading.
             </p>
             <p className="muted">
               It powers our signature <strong style={{ color: "var(--brass-bright)" }}>Energy Reading</strong>:
               a three-card map of <em>you</em>, your <em>current energy</em>, and the <em>shift</em> the
-              universe is asking for — then a Radiant Oracle card names the celestial force at play.
+              universe is asking for — then an Astral Threads card names the celestial force at play.
             </p>
-            <Link href="/oracle" className="btn" style={{ marginTop: "1.5rem" }}>Meet the Radiant Oracle →</Link>
+            <Link href="/oracle" className="btn" style={{ marginTop: "1.5rem" }}>Meet the Astral Threads →</Link>
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={asset("/oracle/capricorn.png")} alt="Radiant Oracle" style={{ width: "100%", borderRadius: "12px", border: "1px solid var(--brass)", boxShadow: "var(--glow-brass)" }} />
+          <img src={asset("/oracle/capricorn.png")} alt="Astral Threads" style={{ width: "100%", borderRadius: "12px", border: "1px solid var(--brass)", boxShadow: "var(--glow-brass)" }} />
         </div>
       </section>
 

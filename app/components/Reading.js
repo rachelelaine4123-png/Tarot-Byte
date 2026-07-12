@@ -256,7 +256,7 @@ export default function Reading({ spreadId, locked = false }) {
 
               <h3 style={{ marginBottom: "1.25rem" }}>Your Reading</h3>
               {reading.interpretation
-                .filter((line) => !line.position.includes("Radiant Oracle")) // oracle handled below
+                .filter((line) => !line.position.includes("Astral Threads")) // oracle handled below
                 .map((line, i) => {
                   const card = reading.cards[i];
                   return (
@@ -278,7 +278,7 @@ export default function Reading({ spreadId, locked = false }) {
               {reading.oracle && (
                 <div style={{ marginBottom: "1.1rem" }}>
                   <div style={{ fontFamily: "var(--font-ui)", fontSize: "0.78rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--arcane)", marginBottom: "0.15rem" }}>
-                    Radiant Oracle Clarifier — <span style={{ color: "var(--brass-bright)" }}>{reading.oracle.sign} · {reading.oracle.keyword}</span>
+                    Astral Threads Clarifier — <span style={{ color: "var(--brass-bright)" }}>{reading.oracle.sign} · {reading.oracle.keyword}</span>
                   </div>
                   <p style={{ color: "var(--ink)" }}>{reading.oracle.energy} {reading.oracle.clarifier}</p>
                 </div>
@@ -518,7 +518,7 @@ function OracleSlot({ oracle, shuffling, delay }) {
         )}
       </div>
       <div style={{ marginTop: "0.6rem", fontFamily: "var(--font-ui)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--arcane)" }}>
-        Radiant Oracle
+        Astral Threads
       </div>
     </div>
   );

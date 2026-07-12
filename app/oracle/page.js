@@ -1,9 +1,9 @@
 import Nav from "../components/Nav";
 import Link from "next/link";
-import { RADIANT_ORACLE } from "@/lib/oracleDeck";
+import { ASTRAL_THREADS } from "@/lib/oracleDeck";
 import { asset } from "@/lib/asset";
 
-export const metadata = { title: "The Radiant Oracle — TarotByte" };
+export const metadata = { title: "The Astral Threads — TarotByte" };
 
 export default function OraclePage() {
   return (
@@ -12,15 +12,16 @@ export default function OraclePage() {
       <main className="container" style={{ paddingTop: "2.5rem", paddingBottom: "4rem" }}>
         <div style={{ textAlign: "center", marginBottom: "2.5rem", maxWidth: 640, margin: "0 auto 2.5rem" }}>
           <div className="eyebrow">Original · astrology-powered · ours alone</div>
-          <h1 style={{ fontSize: "2.8rem", marginTop: "0.5rem" }}>The <span className="gold-text">Radiant Oracle</span></h1>
+          <h1 style={{ fontSize: "2.8rem", marginTop: "0.5rem" }}>The <span className="gold-text">Astral Threads</span></h1>
           <p className="muted" style={{ marginTop: "0.75rem" }}>
             Twelve celestial energies — one for each sign of the zodiac — hand-crafted for TarotByte.
-            Drawn alongside your tarot to clarify the cosmic force at play.
+            Each thread names the cosmic force running through your reading, drawn alongside your tarot
+            to clarify what the universe is weaving.
           </p>
         </div>
 
         <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))" }}>
-          {RADIANT_ORACLE.map((o) => (
+          {ASTRAL_THREADS.map((o) => (
             <div key={o.id} className="panel" style={{ overflow: "hidden" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={asset(o.image)} alt={o.sign} style={{ width: "100%", display: "block" }} />
