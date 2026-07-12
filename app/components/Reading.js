@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { generateReading, SPREADS } from "@/lib/readingEngine";
 import { asset } from "@/lib/asset";
+import { useAccount } from "@/lib/useAccount";
 
 const ZODIAC_GLYPH = {
   Aries: "♈", Taurus: "♉", Gemini: "♊", Cancer: "♋",
@@ -51,23 +52,31 @@ export default function Reading({ spreadId, locked = false }) {
   const [reading, setReading] = useState(null);
   const [phase, setPhase] = useState("idle"); // idle | shuffling | revealed
 
-  // Demo-unlock: ?unlocked=1 unlocks Z (signup/member), ?unlocked=2 unlocks Z+D (subscriber).
-  // Resolved on the client so the route stays static.
-  const [unlockLevel, setUnlockLevel] = useState(0); // 0=guest, 1=member (Celestial), 2=subscriber (Decan Engine)
+  // Account state from Supabase (primary source of truth).
+  const account = useAccount();
+  const loading = account.loading;
 
   // Add-on state (per-reading Decan Engine unlock for MEMBERS who aren't full subscribers).
   const [addonActive, setAddonActive] = useState(false);   // Decan Engine unlocked for THIS reading
-  const [freeCredits, setFreeCredits] = useState(0);         // member's remaining free decan add-ons this month
   const [addonBusy, setAddonBusy] = useState(false);         // "charging" spinner (Stripe stub)
 
+  // unlockLevel: real account (0/1/2) is the source of truth. The ?unlocked= query
+  // param is kept ONLY as a preview fallback so the demo links on /signup still work
+  // when no account is signed in. Real account always wins over the demo param.
+  const [previewLevel, setPreviewLevel] = useState(0);
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const u = params.get("unlocked");
-      if (u === "1") { setUnlockLevel(1); setFreeCredits(DECAN_ADDON.memberFreePerMonth); }
-      if (u === "2") setUnlockLevel(2);
+      if (u === "1") setPreviewLevel(1);
+      if (u === "2") setPreviewLevel(2);
     }
   }, []);
+
+  const unlockLevel =
+    !loading && account.signedIn ? account.unlockLevel : previewLevel;
+  const freeCredits =
+    !loading && account.signedIn ? account.freeDecanCredits : previewLevel === 1 ? DECAN_ADDON.memberFreePerMonth : 0;
 
   const spreadLocked = locked && unlockLevel < 1;
 
@@ -82,15 +91,24 @@ export default function Reading({ spreadId, locked = false }) {
   }
 
   // Member unlocks the Decan Engine for THIS reading — uses a free credit if available,
-  // otherwise "charges" the member price. Stripe is stubbed (mirrors the demo unlock pattern).
-  function activateAddon() {
+  // otherwise "charges" the member price. Stripe is stubbed for now; the free-credit
+  // decrement is synced to Supabase so it persists across sessions.
+  async function activateAddon() {
     setAddonBusy(true);
+    // If they have a free credit, burn it on the server so the count persists.
+    if (account.signedIn && freeCredits > 0) {
+      try {
+        await fetch("/api/decan/addon", { method: "POST" });
+      } catch {
+        /* optimistic: proceed regardless */
+      }
+    }
     setTimeout(() => {
-      setFreeCredits((c) => (c > 0 ? c - 1 : c)); // burn a free credit if they have one
       setAddonActive(true);
       setTier("D"); // jump them straight into the deepest layer
       setAddonBusy(false);
-      // Re-run the current reading at the D tier so the decans appear immediately.
+      // Re-sync account state (free credits may have changed) + re-run the reading at D tier.
+      account.refresh();
       if (reading) {
         const result = generateReading({ spreadId, context, tier: "D" });
         setReading(result);
@@ -112,6 +130,16 @@ export default function Reading({ spreadId, locked = false }) {
   // If someone picks a tier they can't use, snap the draw back to what they can.
   function selectTier(key) {
     setTier(key);
+  }
+
+  // While we're resolving the account, don't flash a locked screen to a signed-in member.
+  if (loading && spreadLocked) {
+    return (
+      <div className="panel" style={{ padding: "2.5rem", textAlign: "center" }}>
+        <div style={{ fontSize: "1.6rem", marginBottom: "0.75rem", color: "var(--brass-bright)" }}>\u2726</div>
+        <p className="muted" style={{ fontFamily: "var(--font-ui)" }}>Resolving your reading\u2026</p>
+      </div>
+    );
   }
 
   if (spreadLocked) {

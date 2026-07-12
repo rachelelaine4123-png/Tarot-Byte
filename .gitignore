@@ -43,6 +43,9 @@ service-account*.json
 # vercel
 .vercel
 
+# agent working notes (not for the repo)
+todo.md
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AccountNav from "./AccountNav";
 
 export default function Nav() {
   return (
@@ -17,9 +18,10 @@ export default function Nav() {
       <div style={{ display: "flex", gap: "1.5rem", alignItems: "center", fontFamily: "var(--font-ui)", fontSize: "0.92rem" }}>
         <Link href="/readings" className="muted">Readings</Link>
         <Link href="/oracle" className="muted">The Oracle</Link>
-        <Link href="/readings/energy-reading" className="btn btn-ghost" style={{ padding: "0.55rem 1.1rem" }}>
+        <Link href="/readings/energy-reading" className="muted" style={{ fontSize: "0.9rem" }}>
           Energy Reading
         </Link>
+        <AccountNav />
       </div>
     </nav>
   );
