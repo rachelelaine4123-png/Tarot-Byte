@@ -51,21 +51,23 @@ export async function GET() {
     supabase.from("profiles").select("tier, email").eq("id", user.id).single(),
     supabase
       .from("entitlements")
-      .select("free_decan_credits, discount_pct")
+      .select("free_decan_credits, purchased_decan_credits, discount_pct")
       .eq("user_id", user.id)
       .single(),
     supabase
       .from("subscriptions")
       .select("status, current_period_end")
       .eq("user_id", user.id)
-      .eq("status", "active")
+      .in("status", ["active", "trialing"])
       .maybeSingle(),
   ]);
 
   // If the auto-provisioning trigger hasn't created rows yet, fall back gracefully.
   const baseTier = profileRes.data?.tier ?? "member";
   const email = profileRes.data?.email ?? user.email;
-  const freeDecanCredits = entRes.data?.free_decan_credits ?? 0;
+  const freeCredits = entRes.data?.free_decan_credits ?? 0;
+  const purchasedCredits = entRes.data?.purchased_decan_credits ?? 0;
+  const freeDecanCredits = freeCredits + purchasedCredits;
 
   // Resolve effective tier: an active subscription upgrades to "subscriber".
   const subscriptionStatus = subRes.data?.status ?? null;

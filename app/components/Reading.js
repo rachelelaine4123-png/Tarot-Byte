@@ -5,6 +5,7 @@ import Link from "next/link";
 import { generateReading, SPREADS } from "@/lib/readingEngine";
 import { asset } from "@/lib/asset";
 import { useAccount } from "@/lib/useAccount";
+import { PRICING } from "@/lib/stripeConfig";
 
 const ZODIAC_GLYPH = {
   Aries: "♈", Taurus: "♉", Gemini: "♊", Cancer: "♋",
@@ -37,11 +38,14 @@ const LADDER = [
   },
 ];
 
-// Add-on economics for the Decan Engine (à la carte + member perks). Stripe stubbed for now.
+// Add-on economics for the Decan Engine (à la carte + member perks).
+// Display prices mirror lib/stripeConfig.js (the Stripe price IDs are the
+// source of truth for checkout). The free monthly credit is granted by Supabase.
 const DECAN_ADDON = {
-  listPrice: 4,        // à la carte, USD
+  listPrice: 4,        // à la carte, USD (display anchor)
   memberPrice: 2,      // member discount price, USD
   memberFreePerMonth: 1, // members get one free Decan add-on each month
+  pack3Price: 5,       // 3-pack bulk price, USD
 };
 
 export default function Reading({ spreadId, locked = false }) {
@@ -59,6 +63,32 @@ export default function Reading({ spreadId, locked = false }) {
   // Add-on state (per-reading Decan Engine unlock for MEMBERS who aren't full subscribers).
   const [addonActive, setAddonActive] = useState(false);   // Decan Engine unlocked for THIS reading
   const [addonBusy, setAddonBusy] = useState(false);         // "charging" spinner (Stripe stub)
+  const [checkoutBusy, setCheckoutBusy] = useState(false); // redirecting to Stripe Checkout
+  const [checkoutError, setCheckoutError] = useState(null);
+
+  // Kick off a Stripe Checkout for a given price id, then redirect the browser.
+  async function startCheckout(priceId) {
+    setCheckoutBusy(true);
+    setCheckoutError(null);
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ priceId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setCheckoutError(data.error || "Checkout unavailable.");
+        setCheckoutBusy(false);
+        return;
+      }
+      // Redirect to Stripe-hosted Checkout.
+      window.location.href = data.url;
+    } catch {
+      setCheckoutError("Could not reach the payment server. Please try again.");
+      setCheckoutBusy(false);
+    }
+  }
 
   // unlockLevel: real account (0/1/2) is the source of truth. The ?unlocked= query
   // param is kept ONLY as a preview fallback so the demo links on /signup still work
@@ -70,6 +100,14 @@ export default function Reading({ spreadId, locked = false }) {
       const u = params.get("unlocked");
       if (u === "1") setPreviewLevel(1);
       if (u === "2") setPreviewLevel(2);
+      // After returning from Stripe Checkout, poll /api/me a couple times so
+      // newly-granted credits show up (webhook fulfillment can lag a few seconds).
+      if (params.get("checkout") === "success") {
+        account.refresh();
+        const t1 = setTimeout(() => account.refresh(), 2500);
+        const t2 = setTimeout(() => account.refresh(), 6000);
+        return () => { clearTimeout(t1); clearTimeout(t2); };
+      }
     }
   }, []);
 
@@ -90,30 +128,35 @@ export default function Reading({ spreadId, locked = false }) {
     return false;
   }
 
-  // Member unlocks the Decan Engine for THIS reading — uses a free credit if available,
-  // otherwise "charges" the member price. Stripe is stubbed for now; the free-credit
-  // decrement is synced to Supabase so it persists across sessions.
+  // Member unlocks the Decan Engine for THIS reading — uses a credit if one is
+  // available (free monthly, then purchased), otherwise redirects to Stripe
+  // Checkout for the $2 member single add-on.
   async function activateAddon() {
-    setAddonBusy(true);
-    // If they have a free credit, burn it on the server so the count persists.
-    if (account.signedIn && freeCredits > 0) {
+    if (freeCredits > 0) {
+      // Burn a credit on the server so the count persists.
+      setAddonBusy(true);
       try {
-        await fetch("/api/decan/addon", { method: "POST" });
+        const res = await fetch("/api/decan/addon", { method: "POST" });
+        if (res.status === 409) {
+          // raced out of credits — fall through to checkout
+          setAddonBusy(false);
+          return startCheckout(PRICING.decan.memberSingle.priceId);
+        }
       } catch {
         /* optimistic: proceed regardless */
       }
-    }
-    setTimeout(() => {
       setAddonActive(true);
       setTier("D"); // jump them straight into the deepest layer
       setAddonBusy(false);
-      // Re-sync account state (free credits may have changed) + re-run the reading at D tier.
       account.refresh();
       if (reading) {
         const result = generateReading({ spreadId, context, tier: "D" });
         setReading(result);
       }
-    }, 1100);
+      return;
+    }
+    // No credits — send them to Stripe Checkout ($2 member single).
+    startCheckout(PRICING.decan.memberSingle.priceId);
   }
 
   function draw() {
@@ -300,6 +343,9 @@ export default function Reading({ spreadId, locked = false }) {
                     freeCredits={freeCredits}
                     busy={addonBusy}
                     onActivate={activateAddon}
+                    onCheckout={startCheckout}
+                    checkoutBusy={checkoutBusy}
+                    checkoutError={checkoutError}
                   />
                 </>
               )}
@@ -416,7 +462,7 @@ function UpsellStrip() {
 }
 
 // --- Decan Engine add-on card (shown to members who haven't unlocked it this reading) ---
-function DecanAddonCard({ freeCredits, busy, onActivate }) {
+function DecanAddonCard({ freeCredits, busy, onActivate, onCheckout, checkoutBusy, checkoutError }) {
   const hasFree = freeCredits > 0;
   return (
     <div style={{
@@ -434,19 +480,43 @@ function DecanAddonCard({ freeCredits, busy, onActivate }) {
         Add the exact 10° celestial degree behind every card to <strong>this reading</strong> — each numbered card resolves to a named decan, its ruling planet, and its calendar window.
       </p>
 
-      <button onClick={onActivate} className="btn btn-lg" disabled={busy}>
+      <button onClick={onActivate} className="btn btn-lg" disabled={busy || checkoutBusy}>
         {busy
           ? "Engaging the engine…"
-          : hasFree
-            ? "Use my free monthly add-on ✦"
-            : `Unlock for this reading — $${DECAN_ADDON.memberPrice}`}
+          : checkoutBusy
+            ? "Redirecting to checkout…"
+            : hasFree
+              ? "Use my free monthly add-on ✦"
+              : `Unlock for this reading — $${DECAN_ADDON.memberPrice}`}
       </button>
+
+      <div style={{ marginTop: "0.9rem", display: "flex", gap: "0.6rem", justifyContent: "center", flexWrap: "wrap" }}>
+        <button
+          onClick={() => onCheckout(PRICING.decan.pack3.priceId)}
+          className="btn"
+          disabled={checkoutBusy}
+          style={{ padding: "0.5rem 1rem", fontSize: "0.85rem", background: "transparent", border: "1px solid var(--brass)", color: "var(--brass-bright)" }}
+        >
+          3-pack — $5 (3 readings)
+        </button>
+        <Link
+          href="/subscribe"
+          className="btn"
+          style={{ padding: "0.5rem 1rem", fontSize: "0.85rem", background: "transparent", border: "1px solid var(--arcane)", color: "var(--arcane)" }}
+        >
+          Subscribe — $6.99/mo or $49/yr
+        </Link>
+      </div>
+
+      {checkoutError && (
+        <p style={{ marginTop: "0.7rem", color: "var(--rose)", fontSize: "0.82rem" }}>{checkoutError}</p>
+      )}
 
       <div style={{ marginTop: "0.9rem", fontFamily: "var(--font-ui)", fontSize: "0.75rem", color: "var(--ink-dim)" }}>
         {hasFree ? (
-          <>You have <strong className="gold-text">{freeCredits}</strong> free member add-on{freeCredits === 1 ? "" : "s"} this month · member price <strong>${DECAN_ADDON.memberPrice}</strong> after (list ${DECAN_ADDON.listPrice})</>
+          <>You have <strong className="gold-text">{freeCredits}</strong> decan credit{freeCredits === 1 ? "" : "s"} available · member price <strong>${DECAN_ADDON.memberPrice}</strong> after (list ${DECAN_ADDON.listPrice})</>
         ) : (
-          <>Member price <strong className="gold-text">${DECAN_ADDON.memberPrice}</strong> (list ${DECAN_ADDON.listPrice}) · or <Link href="/signup?upgrade=decan">subscribe</Link> for unlimited Decan readings</>
+          <>Member price <strong className="gold-text">${DECAN_ADDON.memberPrice}</strong> (list ${DECAN_ADDON.listPrice}) · 3-pack saves you $1</>
         )}
       </div>
     </div>

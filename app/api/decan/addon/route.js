@@ -32,10 +32,10 @@ export async function POST() {
     return NextResponse.json({ error: "not signed in" }, { status: 401 });
   }
 
-  // Fetch current credits.
+  // Fetch current credits. Consume free credits first, then purchased.
   const { data: ent, error } = await supabase
     .from("entitlements")
-    .select("free_decan_credits")
+    .select("free_decan_credits, purchased_decan_credits")
     .eq("user_id", user.id)
     .single();
 
@@ -43,24 +43,36 @@ export async function POST() {
     return NextResponse.json({ error: "entitlements not found" }, { status: 500 });
   }
 
-  if (ent.free_decan_credits <= 0) {
-    return NextResponse.json({ error: "no free credits" }, { status: 409 });
+  const total = (ent.free_decan_credits || 0) + (ent.purchased_decan_credits || 0);
+  if (total <= 0) {
+    return NextResponse.json(
+      { error: "no credits", checkout: true },
+      { status: 409 },
+    );
   }
 
-  // Decrement atomically.
+  // Decrement free first; when free hits 0, start on purchased.
+  let patch;
+  if (ent.free_decan_credits > 0) {
+    patch = { free_decan_credits: ent.free_decan_credits - 1 };
+  } else {
+    patch = { purchased_decan_credits: (ent.purchased_decan_credits || 0) - 1 };
+  }
+  patch.updated_at = new Date().toISOString();
+
   const { data: updated, error: updErr } = await supabase
     .from("entitlements")
-    .update({
-      free_decan_credits: ent.free_decan_credits - 1,
-      updated_at: new Date().toISOString(),
-    })
+    .update(patch)
     .eq("user_id", user.id)
-    .select("free_decan_credits")
+    .select("free_decan_credits, purchased_decan_credits")
     .single();
 
   if (updErr) {
     return NextResponse.json({ error: "update failed" }, { status: 500 });
   }
 
-  return NextResponse.json({ ok: true, freeDecanCredits: updated.free_decan_credits });
+  return NextResponse.json({
+    ok: true,
+    freeDecanCredits: (updated.free_decan_credits || 0) + (updated.purchased_decan_credits || 0),
+  });
 }
