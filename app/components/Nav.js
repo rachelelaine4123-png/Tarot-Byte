@@ -21,6 +21,9 @@ export default function Nav() {
         <Link href="/readings/energy-reading" className="muted" style={{ fontSize: "0.9rem" }}>
           Energy Reading
         </Link>
+        <Link href="/subscribe" className="gold-text" style={{ fontSize: "0.9rem" }}>
+          Subscribe
+        </Link>
         <AccountNav />
       </div>
     </nav>

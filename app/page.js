@@ -4,9 +4,38 @@ import SpreadCard from "./components/SpreadCard";
 import { SPREADS } from "@/lib/readingEngine";
 import { asset } from "@/lib/asset";
 
+export const metadata = {
+  title: "TarotByte — Free Tarot Readings with a Celestial Twist",
+  description:
+    "Free online tarot readings with an astrology-powered twist. Try Yes/No, Past·Present·Future, or your signature Energy Reading. Bite-sized wisdom from the cosmos.",
+  alternates: { canonical: "https://www.tarotbyte.app/" },
+};
+
 export default function Home() {
+  const jsonld = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "TarotByte",
+    url: "https://www.tarotbyte.app",
+    description: "Free tarot readings with a celestial twist — an original astrology-powered Astral Threads deck and your signature Energy Reading.",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: "https://www.tarotbyte.app/readings",
+      "query-input": "required name=search_string",
+    },
+  };
+  const orgJsonld = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "TarotByte",
+    url: "https://www.tarotbyte.app",
+    email: "hello@tarotbyte.app",
+  };
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonld) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonld) }} />
       <Nav />
 
       {/* Hero */}
@@ -131,15 +160,6 @@ export default function Home() {
           </form>
         </div>
       </section>
-
-      <footer style={{ borderTop: "1px solid var(--border)", padding: "2rem 0", textAlign: "center" }}>
-        <div className="container muted" style={{ fontFamily: "var(--font-ui)", fontSize: "0.85rem" }}>
-          <div style={{ fontFamily: "var(--font-display)", fontSize: "1.1rem", color: "var(--ink)", marginBottom: "0.5rem" }}>
-            Tarot<span className="gold-text">Byte</span>
-          </div>
-          © {new Date().getFullYear()} TarotByte · Readings are for reflection & entertainment · Original art & Astral Threads system © TarotByte
-        </div>
-      </footer>
     </>
   );
 }

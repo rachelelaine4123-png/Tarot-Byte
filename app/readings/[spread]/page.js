@@ -8,6 +8,23 @@ export function generateStaticParams() {
   return Object.keys(SPREADS).map((spread) => ({ spread }));
 }
 
+export async function generateMetadata({ params }) {
+  const { spread: spreadId } = await params;
+  const spread = SPREADS[spreadId];
+  if (!spread) return {};
+  const desc = spread.description || "A TarotByte tarot reading with a celestial twist.";
+  return {
+    title: `${spread.name} — Free Tarot Reading`,
+    description: desc,
+    alternates: { canonical: `https://www.tarotbyte.app/readings/${spreadId}` },
+    openGraph: {
+      title: `${spread.name} — TarotByte`,
+      description: desc,
+      url: `https://www.tarotbyte.app/readings/${spreadId}`,
+    },
+  };
+}
+
 export default async function SpreadPage({ params }) {
   const { spread: spreadId } = await params;
   const spread = SPREADS[spreadId];
