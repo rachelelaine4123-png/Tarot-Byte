@@ -435,6 +435,21 @@ function CelestialLine({ line }) {
       <div style={{ fontFamily: "var(--font-ui)", fontSize: "0.7rem", letterSpacing: "0.1em", textTransform: "uppercase", color: isD ? "var(--brass-bright)" : "var(--arcane)", marginBottom: "0.1rem" }}>
         {isD ? "✦ The Decan Engine" : "✦ Celestial"} · {line.label}
       </div>
+      {/* Decan card art — premium D-tier illustration for pip cards */}
+      {isD && line.image && (
+        <div style={{ margin: "0.5rem 0 0.4rem", display: "flex", justifyContent: "flex-start" }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={asset(line.image)}
+            alt={line.title ? `Decan art: ${line.title}` : "Decan card art"}
+            style={{
+              width: "180px", height: "auto", borderRadius: "10px",
+              border: "1px solid var(--brass)", boxShadow: "var(--glow-brass)",
+              objectFit: "cover", display: "block",
+            }}
+          />
+        </div>
+      )}
       {/* Decan title — ownable TarotByte IP, the name of this 10° degree */}
       {isD && line.title && (
         <div style={{ fontFamily: "var(--font-display)", fontSize: "1.05rem", color: "var(--brass-bright)", lineHeight: 1.2, marginBottom: "0.15rem" }}>
