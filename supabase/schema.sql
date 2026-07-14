@@ -67,18 +67,25 @@ ALTER TABLE public.readings       ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.subscriptions  ENABLE ROW LEVEL SECURITY;
 
 -- Profiles: read + update own; insert handled by the auto-trigger (service role bypasses RLS)
-CREATE POLICY "read own profile"      ON public.profiles  FOR SELECT USING (auth.uid() = id);
-CREATE POLICY "update own profile"    ON public.profiles  FOR UPDATE USING (auth.uid() = id);
+DROP POLICY IF EXISTS "read own profile" ON public.profiles;
+CREATE POLICY "read own profile" ON public.profiles  FOR SELECT USING (auth.uid() = id);
+DROP POLICY IF EXISTS "update own profile" ON public.profiles;
+CREATE POLICY "update own profile" ON public.profiles  FOR UPDATE USING (auth.uid() = id);
 
 -- Entitlements: read own (selects drop credits client-side after a free add-on)
+DROP POLICY IF EXISTS "read own entitlements" ON public.entitlements;
 CREATE POLICY "read own entitlements" ON public.entitlements FOR SELECT USING (auth.uid() = user_id);
 
 -- Readings: full CRUD on own
-CREATE POLICY "read own readings"     ON public.readings   FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "insert own readings"   ON public.readings   FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "delete own readings"   ON public.readings   FOR DELETE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "read own readings" ON public.readings;
+CREATE POLICY "read own readings" ON public.readings   FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "insert own readings" ON public.readings;
+CREATE POLICY "insert own readings" ON public.readings   FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "delete own readings" ON public.readings;
+CREATE POLICY "delete own readings" ON public.readings   FOR DELETE USING (auth.uid() = user_id);
 
 -- Subscriptions: read own (writes come from the Stripe webhook / service role)
+DROP POLICY IF EXISTS "read own subscription" ON public.subscriptions;
 CREATE POLICY "read own subscription" ON public.subscriptions FOR SELECT USING (auth.uid() = user_id);
 
 -- =====================================================================
