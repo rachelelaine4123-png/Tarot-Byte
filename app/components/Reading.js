@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { generateReading, SPREADS } from "@/lib/readingEngine";
+import { generateReading, rederiveCelestialLines, SPREADS } from "@/lib/readingEngine";
 import { asset } from "@/lib/asset";
 import { useAccount } from "@/lib/useAccount";
 import { PRICING } from "@/lib/stripeConfig";
@@ -13,7 +13,10 @@ const ZODIAC_GLYPH = {
   Sagittarius: "♐", Capricorn: "♑", Aquarius: "♒", Pisces: "♓",
 };
 
-// The T / Z / D ladder definition — steampunk-flavoured tier names with hover tooltips.
+// The T / Z / D ladder definition — with the new naming:
+//   T = Classic (card + meaning)
+//   Z = Astral Threads (zodiac sign + ruling planet overlay)
+//   D = The Decan Engine (exact 10° decan degree)
 const LADDER = [
   {
     key: "T",
@@ -24,28 +27,25 @@ const LADDER = [
   },
   {
     key: "Z",
-    name: "Celestial",
+    name: "Astral Threads",
     sub: "Each card's sign & planet",
-    tip: "Each card's zodiac sign & ruling planet, layered over the classic meaning.",
+    tip: "Each card's zodiac sign & ruling planet, layered over the classic meaning. This is the Astral Thread — the celestial address that tells you why and when.",
     need: "member",
   },
   {
     key: "D",
     name: "The Decan Engine",
     sub: "The exact 10° celestial degree",
-    tip: "The exact 10° celestial degree behind every card — the deepest, most precise layer TarotByte offers.",
+    tip: "The exact 10° celestial degree behind every card — the deepest, most precise layer TarotByte offers. The Decan Engine resolves each Astral Thread to its precise degree.",
     need: "subscriber",
   },
 ];
 
-// Add-on economics for the Decan Engine (à la carte + member perks).
-// Display prices mirror lib/stripeConfig.js (the Stripe price IDs are the
-// source of truth for checkout). The free monthly credit is granted by Supabase.
 const DECAN_ADDON = {
-  listPrice: 4,        // à la carte, USD (display anchor)
-  memberPrice: 2,      // member discount price, USD
-  memberFreePerMonth: 1, // members get one free Decan add-on each month
-  pack3Price: 5,       // 3-pack bulk price, USD
+  listPrice: 4,
+  memberPrice: 2,
+  memberFreePerMonth: 1,
+  pack3Price: 5,
 };
 
 export default function Reading({ spreadId, locked = false }) {
@@ -56,17 +56,14 @@ export default function Reading({ spreadId, locked = false }) {
   const [reading, setReading] = useState(null);
   const [phase, setPhase] = useState("idle"); // idle | shuffling | revealed
 
-  // Account state from Supabase (primary source of truth).
   const account = useAccount();
   const loading = account.loading;
 
-  // Add-on state (per-reading Decan Engine unlock for MEMBERS who aren't full subscribers).
-  const [addonActive, setAddonActive] = useState(false);   // Decan Engine unlocked for THIS reading
-  const [addonBusy, setAddonBusy] = useState(false);         // "charging" spinner (Stripe stub)
-  const [checkoutBusy, setCheckoutBusy] = useState(false); // redirecting to Stripe Checkout
+  const [addonActive, setAddonActive] = useState(false);
+  const [addonBusy, setAddonBusy] = useState(false);
+  const [checkoutBusy, setCheckoutBusy] = useState(false);
   const [checkoutError, setCheckoutError] = useState(null);
 
-  // Kick off a Stripe Checkout for a given price id, then redirect the browser.
   async function startCheckout(priceId) {
     setCheckoutBusy(true);
     setCheckoutError(null);
@@ -82,7 +79,6 @@ export default function Reading({ spreadId, locked = false }) {
         setCheckoutBusy(false);
         return;
       }
-      // Redirect to Stripe-hosted Checkout.
       window.location.href = data.url;
     } catch {
       setCheckoutError("Could not reach the payment server. Please try again.");
@@ -90,9 +86,6 @@ export default function Reading({ spreadId, locked = false }) {
     }
   }
 
-  // unlockLevel: real account (0/1/2) is the source of truth. The ?unlocked= query
-  // param is kept ONLY as a preview fallback so the demo links on /signup still work
-  // when no account is signed in. Real account always wins over the demo param.
   const [previewLevel, setPreviewLevel] = useState(0);
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -100,8 +93,6 @@ export default function Reading({ spreadId, locked = false }) {
       const u = params.get("unlocked");
       if (u === "1") setPreviewLevel(1);
       if (u === "2") setPreviewLevel(2);
-      // After returning from Stripe Checkout, poll /api/me a couple times so
-      // newly-granted credits show up (webhook fulfillment can lag a few seconds).
       if (params.get("checkout") === "success") {
         account.refresh();
         const t1 = setTimeout(() => account.refresh(), 2500);
@@ -117,8 +108,6 @@ export default function Reading({ spreadId, locked = false }) {
     !loading && account.signedIn ? account.freeDecanCredits : previewLevel === 1 ? DECAN_ADDON.memberFreePerMonth : 0;
 
   const spreadLocked = locked && unlockLevel < 1;
-
-  // Effective D access = full subscriber (level 2) OR member who unlocked the add-on this reading.
   const decanUnlocked = unlockLevel >= 2 || addonActive;
 
   function canUseTier(key) {
@@ -128,17 +117,17 @@ export default function Reading({ spreadId, locked = false }) {
     return false;
   }
 
-  // Member unlocks the Decan Engine for THIS reading — uses a credit if one is
-  // available (free monthly, then purchased), otherwise redirects to Stripe
-  // Checkout for the $2 member single add-on.
+  // Member unlocks the Decan Engine for THIS reading — uses a credit if one
+  // is available, otherwise redirects to Stripe Checkout.
+  // IMPORTANT: this does NOT redraw the hand. It re-derives the celestial
+  // lines on the existing drawn cards so the user keeps their cards and
+  // only gains the deeper layer.
   async function activateAddon() {
     if (freeCredits > 0) {
-      // Burn a credit on the server so the count persists.
       setAddonBusy(true);
       try {
         const res = await fetch("/api/decan/addon", { method: "POST" });
         if (res.status === 409) {
-          // raced out of credits — fall through to checkout
           setAddonBusy(false);
           return startCheckout(PRICING.decan.memberSingle.priceId);
         }
@@ -146,16 +135,15 @@ export default function Reading({ spreadId, locked = false }) {
         /* optimistic: proceed regardless */
       }
       setAddonActive(true);
-      setTier("D"); // jump them straight into the deepest layer
+      setTier("D");
       setAddonBusy(false);
       account.refresh();
+      // Re-derive celestial lines on EXISTING cards — no redraw.
       if (reading) {
-        const result = generateReading({ spreadId, context, tier: "D" });
-        setReading(result);
+        setReading(rederiveCelestialLines(reading, "D"));
       }
       return;
     }
-    // No credits — send them to Stripe Checkout ($2 member single).
     startCheckout(PRICING.decan.memberSingle.priceId);
   }
 
@@ -170,17 +158,15 @@ export default function Reading({ spreadId, locked = false }) {
     }, 1300);
   }
 
-  // If someone picks a tier they can't use, snap the draw back to what they can.
   function selectTier(key) {
     setTier(key);
   }
 
-  // While we're resolving the account, don't flash a locked screen to a signed-in member.
   if (loading && spreadLocked) {
     return (
       <div className="panel" style={{ padding: "2.5rem", textAlign: "center" }}>
-        <div style={{ fontSize: "1.6rem", marginBottom: "0.75rem", color: "var(--brass-bright)" }}>\u2726</div>
-        <p className="muted" style={{ fontFamily: "var(--font-ui)" }}>Resolving your reading\u2026</p>
+        <div style={{ fontSize: "1.6rem", marginBottom: "0.75rem", color: "var(--brass-bright)" }}>✦</div>
+        <p className="muted" style={{ fontFamily: "var(--font-ui)" }}>Resolving your reading…</p>
       </div>
     );
   }
@@ -198,9 +184,11 @@ export default function Reading({ spreadId, locked = false }) {
     );
   }
 
+  const cardCount = spread.cards + (spread.usesOracle ? 1 : 0);
+  const showThemeBanner = context && reading && phase === "revealed";
+
   return (
     <div>
-      {/* --- Classic / Celestial / Decan Engine Ladder --- */}
       <TierLadder tier={tier} unlockLevel={unlockLevel} decanUnlocked={decanUnlocked} onSelect={selectTier} />
 
       <div className="panel" style={{ padding: "1.75rem 2rem", marginBottom: "2rem" }}>
@@ -250,13 +238,14 @@ export default function Reading({ spreadId, locked = false }) {
         </span>
       </div>
 
-      {/* Card display */}
+      {/* Card display + connected interpretation boxes */}
       {phase !== "idle" && (
-        <div>
-          <div style={{
+        <div className="reading-board">
+          {/* Card row */}
+          <div className="card-row" style={{
             display: "grid",
-            gridTemplateColumns: `repeat(${Math.min(spread.cards + (spread.usesOracle ? 1 : 0), 4)}, 1fr)`,
-            gap: "1.25rem", marginBottom: "2rem",
+            gridTemplateColumns: `repeat(${Math.min(cardCount, 4)}, 1fr)`,
+            gap: "1.25rem",
           }}>
             {spread.positions.map((pos, i) => (
               <CardSlot
@@ -272,8 +261,56 @@ export default function Reading({ spreadId, locked = false }) {
             )}
           </div>
 
+          {/* Connector lines (visual) */}
           {reading && phase === "revealed" && (
-            <div className="panel" style={{ padding: "2rem" }}>
+            <div className="connector-row" style={{
+              display: "grid",
+              gridTemplateColumns: `repeat(${Math.min(cardCount, 4)}, 1fr)`,
+              gap: "1.25rem",
+            }}>
+              {Array.from({ length: cardCount }).map((_, i) => (
+                <div key={i} className="connector-line" />
+              ))}
+            </div>
+          )}
+
+          {/* Interpretation boxes — one per card, connected visually */}
+          {reading && phase === "revealed" && (
+            <div className="interp-row" style={{
+              display: "grid",
+              gridTemplateColumns: `repeat(${Math.min(cardCount, 4)}, 1fr)`,
+              gap: "1.25rem",
+            }}>
+              {reading.interpretation
+                .filter((line) => !line.position.includes("Astral Threads"))
+                .map((line, i) => {
+                  const card = reading.cards[i];
+                  return (
+                    <InterpBox
+                      key={i}
+                      line={line}
+                      card={card}
+                      celestialLines={card?.celestialLines}
+                    />
+                  );
+                })}
+              {reading.oracle && (
+                <OracleInterpBox oracle={reading.oracle} />
+              )}
+            </div>
+          )}
+
+          {/* Summary panel below the connected boxes */}
+          {reading && phase === "revealed" && (
+            <div className="panel" style={{ padding: "2rem", marginTop: "2rem" }}>
+              {/* Theme banner — single sentence at top, no per-card repetition */}
+              {showThemeBanner && (
+                <div className="theme-banner">
+                  <span className="theme-banner-label">✦ Your Focus</span>
+                  <p>This reading is held in the context of <strong className="gold-text">{context}</strong>. Every card below speaks to that theme — you don't need to weigh it separately for each position.</p>
+                </div>
+              )}
+
               {reading.verdict && (
                 <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
                   <div className="eyebrow">The Verdict</div>
@@ -285,49 +322,13 @@ export default function Reading({ spreadId, locked = false }) {
 
               {/* Reading-level celestial weather */}
               {reading.tone && (
-                <div style={{
-                  border: "1px solid var(--arcane)", borderRadius: "12px",
-                  padding: "0.9rem 1.1rem", marginBottom: "1.5rem",
-                  background: "rgba(92,225,230,0.06)",
-                }}>
-                  <div style={{ fontFamily: "var(--font-ui)", fontSize: "0.72rem", letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--arcane)", marginBottom: "0.25rem" }}>
-                    ✦ Celestial Weather
-                  </div>
-                  <p style={{ color: "var(--ink)", fontSize: "0.92rem", margin: 0 }}>{reading.tone.text}</p>
+                <div className="weather-box">
+                  <div className="weather-label">✦ Astral Weather</div>
+                  <p>{reading.tone.text}</p>
                 </div>
               )}
 
-              <h3 style={{ marginBottom: "1.25rem" }}>Your Reading</h3>
-              {reading.interpretation
-                .filter((line) => !line.position.includes("Astral Threads")) // oracle handled below
-                .map((line, i) => {
-                  const card = reading.cards[i];
-                  return (
-                    <div key={i} style={{ marginBottom: "1.4rem" }}>
-                      <div style={{ fontFamily: "var(--font-ui)", fontSize: "0.78rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--arcane)", marginBottom: "0.15rem" }}>
-                        {line.position} — <span style={{ color: "var(--brass-bright)" }}>{line.card}</span>
-                      </div>
-                      <p style={{ color: "var(--ink)" }}>{line.text.replace(/^[^.]*\.\s*/, "")}</p>
-
-                      {/* Celestial layers (Z / D) for this card */}
-                      {card?.celestialLines?.map((cl, j) => (
-                        <CelestialLine key={j} line={cl} />
-                      ))}
-                    </div>
-                  );
-                })}
-
-              {/* Oracle clarifier (energy reading only) */}
-              {reading.oracle && (
-                <div style={{ marginBottom: "1.1rem" }}>
-                  <div style={{ fontFamily: "var(--font-ui)", fontSize: "0.78rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--arcane)", marginBottom: "0.15rem" }}>
-                    Astral Threads Clarifier — <span style={{ color: "var(--brass-bright)" }}>{reading.oracle.sign} · {reading.oracle.keyword}</span>
-                  </div>
-                  <p style={{ color: "var(--ink)" }}>{reading.oracle.energy} {reading.oracle.clarifier}</p>
-                </div>
-              )}
-
-              {/* Guest → sign up for the Celestial layer */}
+              {/* Guest → sign up for the Astral Threads layer */}
               {unlockLevel === 0 && (
                 <>
                   <div className="divider" style={{ margin: "1.5rem 0" }} />
@@ -335,7 +336,7 @@ export default function Reading({ spreadId, locked = false }) {
                 </>
               )}
 
-              {/* Member (Celestial) who hasn't unlocked the Decan Engine this reading → add-on card */}
+              {/* Member who hasn't unlocked the Decan Engine this reading → add-on card */}
               {unlockLevel === 1 && !addonActive && (
                 <>
                   <div className="divider" style={{ margin: "1.5rem 0" }} />
@@ -368,13 +369,41 @@ export default function Reading({ spreadId, locked = false }) {
   );
 }
 
-// --- Classic / Celestial / Decan Engine ladder selector (with hover tooltips) ---
+// --- Interpretation box that sits below each card, connected by a line ---
+function InterpBox({ line, card, celestialLines }) {
+  return (
+    <div className="interp-box">
+      <div className="interp-position">
+        {line.position} — <span className="interp-card-name">{line.card}</span>
+      </div>
+      <p className="interp-text">{line.text.replace(/^[^.]*\.\s*/, "")}</p>
+
+      {/* Astral Threads layers (Z / D) for this card */}
+      {celestialLines?.map((cl, j) => (
+        <CelestialLine key={j} line={cl} />
+      ))}
+    </div>
+  );
+}
+
+// --- Oracle interpretation box ---
+function OracleInterpBox({ oracle }) {
+  return (
+    <div className="interp-box oracle-interp-box">
+      <div className="interp-position">
+        Astral Threads Clarifier — <span className="interp-card-name">{oracle.sign} · {oracle.keyword}</span>
+      </div>
+      <p className="interp-text">{oracle.energy} {oracle.clarifier}</p>
+    </div>
+  );
+}
+
+// --- Classic / Astral Threads / Decan Engine ladder selector ---
 function TierLadder({ tier, unlockLevel, decanUnlocked, onSelect }) {
   const levelOf = { T: 0, Z: 1, D: 2 };
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0.75rem", marginBottom: "1.5rem" }}>
       {LADDER.map((l) => {
-        // D is "unlocked" if they're a subscriber OR have activated the per-reading add-on.
         const unlocked = l.key === "D" ? decanUnlocked : levelOf[l.key] <= unlockLevel;
         const active = tier === l.key;
         return (
@@ -406,7 +435,6 @@ function TierLadder({ tier, unlockLevel, decanUnlocked, onSelect }) {
                 {l.key === "Z" ? "Sign up to unlock" : "Add on or subscribe"}
               </div>
             )}
-            {/* hover tooltip (steampunk brass card) */}
             <span className="tier-tip" style={{
               position: "absolute", left: "50%", bottom: "calc(100% + 8px)", transform: "translateX(-50%)",
               width: "220px", padding: "0.6rem 0.75rem", borderRadius: "10px",
@@ -433,9 +461,8 @@ function CelestialLine({ line }) {
       borderLeft: `2px solid ${isD ? "var(--brass)" : "var(--arcane)"}`,
     }}>
       <div style={{ fontFamily: "var(--font-ui)", fontSize: "0.7rem", letterSpacing: "0.1em", textTransform: "uppercase", color: isD ? "var(--brass-bright)" : "var(--arcane)", marginBottom: "0.1rem" }}>
-        {isD ? "✦ The Decan Engine" : "✦ Celestial"} · {line.label}
+        {isD ? "✦ The Decan Engine" : "✦ Astral Threads"} · {line.label}
       </div>
-      {/* Decan card art — premium D-tier illustration for pip cards */}
       {isD && line.image && (
         <div style={{ margin: "0.5rem 0 0.4rem", display: "flex", justifyContent: "flex-start" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -450,7 +477,6 @@ function CelestialLine({ line }) {
           />
         </div>
       )}
-      {/* Decan title — ownable TarotByte IP, the name of this 10° degree */}
       {isD && line.title && (
         <div style={{ fontFamily: "var(--font-display)", fontSize: "1.05rem", color: "var(--brass-bright)", lineHeight: 1.2, marginBottom: "0.15rem" }}>
           {line.title}
@@ -461,7 +487,7 @@ function CelestialLine({ line }) {
   );
 }
 
-// --- Guest upsell: sign up free to unlock the Celestial layer ---
+// --- Guest upsell ---
 function UpsellStrip() {
   return (
     <div style={{ textAlign: "center" }}>
@@ -469,14 +495,19 @@ function UpsellStrip() {
         <strong className="gold-text">There&apos;s more beneath these cards.</strong>
       </p>
       <p className="muted" style={{ fontSize: "0.88rem", maxWidth: 520, margin: "0 auto 1rem" }}>
-        Every card sits at a celestial address. Sign up free to unlock the <strong>Celestial layer</strong> — each card&apos;s sign & ruling planet — then power up <strong>The Decan Engine</strong> to reveal the exact 10° degree behind it.
+        Every card sits at a celestial address. Sign up free to unlock the <strong>Astral Threads</strong> layer — each card&apos;s sign & ruling planet — then power up <strong>The Decan Engine</strong> to reveal the exact 10° degree behind it.
       </p>
-      <Link href="/signup" className="btn btn-lg">Sign up free → unlock the Celestial layer</Link>
+      <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center", flexWrap: "wrap" }}>
+        <Link href="/signup" className="btn btn-lg">Sign up free →</Link>
+        <Link href="/guide" className="btn" style={{ background: "transparent", border: "1px solid var(--arcane)", color: "var(--arcane)" }}>
+          How does this work?
+        </Link>
+      </div>
     </div>
   );
 }
 
-// --- Decan Engine add-on card (shown to members who haven't unlocked it this reading) ---
+// --- Decan Engine add-on card ---
 function DecanAddonCard({ freeCredits, busy, onActivate, onCheckout, checkoutBusy, checkoutError }) {
   const hasFree = freeCredits > 0;
   return (
@@ -492,7 +523,7 @@ function DecanAddonCard({ freeCredits, busy, onActivate, onCheckout, checkoutBus
         The Decan Engine
       </div>
       <p className="muted" style={{ fontSize: "0.88rem", maxWidth: 500, margin: "0 auto 1.1rem" }}>
-        Add the exact 10° celestial degree behind every card to <strong>this reading</strong> — each numbered card resolves to a named decan, its ruling planet, and its calendar window.
+        Add the exact 10° celestial degree behind every card to <strong>this reading</strong> — your cards stay the same, only the depth layer changes. Each numbered card resolves to a named decan, its ruling planet, and its calendar window.
       </p>
 
       <button onClick={onActivate} className="btn btn-lg" disabled={busy || checkoutBusy}>
@@ -560,7 +591,7 @@ function CardSlot({ label, card, shuffling, delay }) {
             </div>
             {card.reversed && (
               <div style={{ fontSize: "0.7rem", color: "var(--rose)", fontFamily: "var(--font-ui)", letterSpacing: "0.1em", marginTop: "0.35rem" }}>
-                ⟲ REVERSED
+                ↺ REVERSED
               </div>
             )}
             {card.celestial?.glyph && (

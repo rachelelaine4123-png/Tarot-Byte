@@ -4,7 +4,7 @@ import Footer from "./components/Footer";
 export const metadata = {
   metadataBase: new URL("https://www.tarotbyte.app"),
   title: {
-    default: "TarotByte — Digital Tarot with a Celestial Twist",
+    default: "TarotByte — Digital Tarot with an Astral Twist",
     template: "%s — TarotByte",
   },
   description:
@@ -20,15 +20,15 @@ export const metadata = {
     locale: "en_US",
     url: "https://www.tarotbyte.app",
     siteName: "TarotByte",
-    title: "TarotByte — Digital Tarot with a Celestial Twist",
+    title: "TarotByte — Digital Tarot with an Astral Twist",
     description:
-      "Free tarot readings with a celestial twist. An original astrology-powered Astral Threads deck and your signature Energy Reading.",
+      "Free tarot readings with an astral twist. An original astrology-powered Astral Threads deck and your signature Energy Reading.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "TarotByte — Digital Tarot with a Celestial Twist",
+    title: "TarotByte — Digital Tarot with an Astral Twist",
     description:
-      "Free tarot readings with a celestial twist. Bite-sized wisdom for the modern seeker.",
+      "Free tarot readings with an astral twist. Bite-sized wisdom for the modern seeker.",
   },
   robots: {
     index: true,

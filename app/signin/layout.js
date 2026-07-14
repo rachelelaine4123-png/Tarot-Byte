@@ -1,6 +1,6 @@
 export const metadata = {
   title: "Sign In — TarotByte",
-  description: "Sign in to your TarotByte account to access your saved readings and the Celestial layer.",
+  description: "Sign in to your TarotByte account to access your saved readings and the Astral Threads layer.",
   alternates: { canonical: "https://www.tarotbyte.app/signin" },
 };
 

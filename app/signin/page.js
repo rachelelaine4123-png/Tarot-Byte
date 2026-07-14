@@ -147,7 +147,7 @@ export default function SignInPage() {
                 Sign in to <span className="gold-text">TarotByte</span>
               </h1>
               <p className="muted center" style={{ marginBottom: "1.75rem" }}>
-                Pick up where you left off — your saved readings and Celestial layer are waiting.
+                Pick up where you left off — your saved readings and Astral Threads layer are waiting.
               </p>
               <form onSubmit={submit} className="stack">
                 <input

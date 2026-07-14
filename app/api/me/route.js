@@ -13,7 +13,7 @@
 //     currentPeriodEnd: null | "2025-08-12..."
 //   }
 //
-// The client uses `tier` to gate the reading ladder (Classic/Celestial/Decan)
+// The client uses `tier` to gate the reading ladder (Classic / Astral Threads / Decan)
 // and `freeDecanCredits` to decide whether the Decan add-on is free or paid.
 //
 // Graceful degradation: if Supabase env vars aren't set, returns the "guest"

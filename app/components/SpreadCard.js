@@ -73,7 +73,7 @@ export default function SpreadCard({ s }) {
         </span>
         <span style={{ color: "var(--border)" }}>·</span>
         <span style={{ color: "var(--ink-dim)" }}>
-          Classic · Celestial · Decan Engine
+          Classic · Astral Threads · Decan Engine
         </span>
       </div>
 

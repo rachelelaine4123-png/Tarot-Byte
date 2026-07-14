@@ -9,8 +9,7 @@ import { PRICING } from "@/lib/stripeConfig";
 // /subscribe — the subscription purchase page.
 // Shows the $6.99/mo + $49/yr plans. If the visitor is signed in, clicking a
 // plan redirects to Stripe Checkout. If not, it sends them to /signup first
-// (they'll come back here after confirming their email — handled by the
-// next= param on the email redirect).
+// with a redirect-back param so they return here after confirming email.
 export default function SubscribePage() {
   const account = useAccount();
   const [busy, setBusy] = useState(null); // "monthly" | "annual" | null
@@ -20,8 +19,9 @@ export default function SubscribePage() {
     setBusy(plan);
     setError(null);
     if (!account.signedIn) {
-      // Send them to sign up; the signup success flow will bring them back.
-      window.location.href = "/signup?upgrade=decan";
+      // Send them to sign up with a redirect-back param. The signup flow
+      // carries this through the email confirmation so they land back here.
+      window.location.href = "/signup?next=/subscribe";
       return;
     }
     const priceId =
@@ -49,6 +49,16 @@ export default function SubscribePage() {
 
   const loading = account.loading;
 
+  // Identical feature list for both plans — the only difference is the
+  // "2 months free" line on annual. This keeps the panels the same height
+  // and communicates that both plans offer the same product.
+  const sharedFeatures = [
+    "Unlimited Decan Engine readings",
+    "All current & future spreads",
+    "Saved reading history",
+    "Cancel anytime",
+  ];
+
   return (
     <>
       <Nav />
@@ -63,20 +73,22 @@ export default function SubscribePage() {
           </p>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem", alignItems: "stretch" }}>
           {/* Monthly */}
-          <div className="panel" style={{ padding: "2rem", textAlign: "center", border: "1px solid var(--border)" }}>
+          <div className="panel subscribe-panel" style={{ padding: "2rem", textAlign: "center", border: "1px solid var(--border)", display: "flex", flexDirection: "column" }}>
             <div style={{ fontFamily: "var(--font-ui)", fontSize: "0.78rem", letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ink-dim)", marginBottom: "0.6rem" }}>
               Monthly
             </div>
             <div style={{ fontFamily: "var(--font-display)", fontSize: "2.6rem", color: "var(--ink)" }}>
               $6.99<span style={{ fontSize: "1rem", color: "var(--ink-dim)" }}>/mo</span>
             </div>
-            <ul style={{ listStyle: "none", padding: 0, margin: "1.25rem 0 1.5rem", textAlign: "left", fontFamily: "var(--font-ui)", fontSize: "0.9rem", color: "var(--ink-dim)" }}>
-              <li style={{ marginBottom: "0.5rem" }}>✦ Unlimited Decan Engine</li>
-              <li style={{ marginBottom: "0.5rem" }}>✦ All current spreads</li>
-              <li style={{ marginBottom: "0.5rem" }}>✦ Saved reading history</li>
-              <li style={{ marginBottom: "0.5rem" }}>✦ Cancel anytime</li>
+            <div style={{ fontFamily: "var(--font-ui)", fontSize: "0.82rem", color: "var(--ink-dim)", marginBottom: "0.5rem", minHeight: "1.2rem" }}>
+              Billed monthly
+            </div>
+            <ul style={{ listStyle: "none", padding: 0, margin: "0.75rem 0 1.5rem", textAlign: "left", fontFamily: "var(--font-ui)", fontSize: "0.9rem", color: "var(--ink-dim)", flexGrow: 1 }}>
+              {sharedFeatures.map((f) => (
+                <li key={f} style={{ marginBottom: "0.5rem" }}>✦ {f}</li>
+              ))}
             </ul>
             <button
               onClick={() => choosePlan("monthly")}
@@ -89,10 +101,10 @@ export default function SubscribePage() {
           </div>
 
           {/* Annual — hero */}
-          <div className="panel" style={{
+          <div className="panel subscribe-panel" style={{
             padding: "2rem", textAlign: "center",
             border: "1px solid var(--brass)", boxShadow: "var(--glow-brass)",
-            position: "relative",
+            position: "relative", display: "flex", flexDirection: "column",
           }}>
             <div style={{
               position: "absolute", top: "-0.7rem", left: "50%", transform: "translateX(-50%)",
@@ -108,14 +120,13 @@ export default function SubscribePage() {
             <div style={{ fontFamily: "var(--font-display)", fontSize: "2.6rem", color: "var(--brass-bright)" }}>
               $49<span style={{ fontSize: "1rem", color: "var(--ink-dim)" }}>/yr</span>
             </div>
-            <div style={{ fontFamily: "var(--font-ui)", fontSize: "0.82rem", color: "var(--ink-dim)", marginBottom: "0.5rem" }}>
-              ≈ $4.08/mo · save 42%
+            <div style={{ fontFamily: "var(--font-ui)", fontSize: "0.82rem", color: "var(--ink-dim)", marginBottom: "0.5rem", minHeight: "1.2rem" }}>
+              ≈ $4.08/mo · <span className="gold-text">2 months free</span>
             </div>
-            <ul style={{ listStyle: "none", padding: 0, margin: "0.75rem 0 1.5rem", textAlign: "left", fontFamily: "var(--font-ui)", fontSize: "0.9rem", color: "var(--ink-dim)" }}>
-              <li style={{ marginBottom: "0.5rem" }}>✦ Everything in Monthly</li>
-              <li style={{ marginBottom: "0.5rem" }}>✦ 2 months free each year</li>
-              <li style={{ marginBottom: "0.5rem" }}>✦ Priority access to new spreads</li>
-              <li style={{ marginBottom: "0.5rem" }}>✦ Cancel anytime</li>
+            <ul style={{ listStyle: "none", padding: 0, margin: "0.75rem 0 1.5rem", textAlign: "left", fontFamily: "var(--font-ui)", fontSize: "0.9rem", color: "var(--ink-dim)", flexGrow: 1 }}>
+              {sharedFeatures.map((f) => (
+                <li key={f} style={{ marginBottom: "0.5rem" }}>✦ {f}</li>
+              ))}
             </ul>
             <button
               onClick={() => choosePlan("annual")}

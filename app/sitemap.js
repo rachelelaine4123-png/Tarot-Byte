@@ -10,6 +10,7 @@ export default function sitemap() {
     { url: `${base}/`, priority: 1.0, changeFrequency: "weekly" },
     { url: `${base}/readings`, priority: 0.9, changeFrequency: "weekly" },
     { url: `${base}/oracle`, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${base}/guide`, priority: 0.75, changeFrequency: "monthly" },
     { url: `${base}/subscribe`, priority: 0.7, changeFrequency: "monthly" },
     { url: `${base}/signup`, priority: 0.6, changeFrequency: "monthly" },
     { url: `${base}/signin`, priority: 0.4, changeFrequency: "monthly" },

@@ -5,7 +5,7 @@ import { SPREADS } from "@/lib/readingEngine";
 import { asset } from "@/lib/asset";
 
 export const metadata = {
-  title: "TarotByte — Free Tarot Readings with a Celestial Twist",
+  title: "TarotByte — Free Tarot Readings with an Astral Twist",
   description:
     "Free online tarot readings with an astrology-powered twist. Try Yes/No, Past·Present·Future, or your signature Energy Reading. Bite-sized wisdom from the cosmos.",
   alternates: { canonical: "https://www.tarotbyte.app/" },

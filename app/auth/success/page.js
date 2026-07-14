@@ -13,16 +13,16 @@ export default function AuthSuccessPage() {
           <h1 style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>You&apos;re in!</h1>
           <p className="muted" style={{ marginBottom: "1.5rem" }}>
             Welcome to TarotByte, seeker. Your email is confirmed and your account is active.
-            You&apos;ve unlocked the <strong className="gold-text">Celestial</strong> layer — every card now
+            You&apos;ve unlocked the <strong className="gold-text">Astral Threads</strong> layer — every card now
             reveals its zodiac sign & ruling planet. As a member you also get{" "}
             <strong className="gold-text">one free Decan Engine add-on</strong> each month.
           </p>
           <div className="stack" style={{ gap: "0.75rem" }}>
             <Link href="/readings/energy-reading" className="btn btn-lg" style={{ justifyContent: "center" }}>
-              Open my Energy Reading (Celestial) →
+              Open my Energy Reading →
             </Link>
             <Link href="/readings/past-present-future" className="btn" style={{ justifyContent: "center", background: "transparent", border: "1px solid var(--brass)", color: "var(--brass-bright)" }}>
-              Try Past · Present · Future (Celestial) →
+              Try Past · Present · Future →
             </Link>
           </div>
           <div className="divider" style={{ margin: "1.5rem 0" }} />
@@ -31,8 +31,8 @@ export default function AuthSuccessPage() {
             exact 10° celestial degree behind every numbered card — and names it. Add it to any reading, or
             subscribe for unlimited.
           </p>
-          <Link href="/readings/energy-reading?unlocked=2" className="btn" style={{ justifyContent: "center", fontSize: "0.9rem" }}>
-            ✦ Preview The Decan Engine →
+          <Link href="/subscribe" className="btn" style={{ justifyContent: "center", fontSize: "0.9rem" }}>
+            ✦ See subscription plans →
           </Link>
         </div>
       </main>

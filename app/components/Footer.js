@@ -13,7 +13,7 @@ export default function Footer() {
             Tarot<span className="gold-text">Byte</span>
           </div>
           <p className="footer-tag">
-            Free tarot readings with a celestial twist. Bite-sized wisdom for the modern seeker.
+            Free tarot readings with an astral twist. Bite-sized wisdom for the modern seeker.
           </p>
         </div>
 
@@ -28,6 +28,7 @@ export default function Footer() {
         <div className="footer-col">
           <h4>Explore</h4>
           <Link href="/oracle">Astral Threads</Link>
+          <Link href="/guide">How it works</Link>
           <Link href="/subscribe">Subscribe</Link>
           <Link href="/signup">Sign up free</Link>
           <Link href="/signin">Sign in</Link>

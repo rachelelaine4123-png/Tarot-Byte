@@ -14,11 +14,17 @@ export default function SignupPage() {
   const account = useAccount();
 
   // Pre-fill email if arriving from the homepage newsletter form (?email=...)
+  // Capture the ?next= redirect target so we can carry it through the email
+  // confirmation flow and bring the user back to where they were heading
+  // (e.g. /subscribe) after they confirm their email.
+  const [nextPath, setNextPath] = useState(null);
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const prefill = params.get("email");
       if (prefill) setEmail(prefill);
+      const next = params.get("next");
+      if (next && next.startsWith("/")) setNextPath(next);
     }
   }, []);
 
@@ -40,7 +46,10 @@ export default function SignupPage() {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback?next=/auth/success`,
+          // Carry the redirect-back path through the email confirmation so
+          // the user lands on /subscribe (or wherever they came from) after
+          // confirming, not just the generic success page.
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath || "/auth/success")}`,
         },
       });
       if (signUpError) {
@@ -114,7 +123,8 @@ export default function SignupPage() {
                 <>
                   <h1 style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>Check your inbox</h1>
                   <p className="muted" style={{ marginBottom: "1.5rem" }}>
-                    We&apos;ve sent a confirmation link to <strong className="gold-text">{email}</strong>. Click it to activate your free account — then you&apos;ll unlock the <strong className="gold-text">Celestial</strong> layer and get <strong className="gold-text">one free Decan Engine add-on</strong> each month.
+                    We&apos;ve sent a confirmation link to <strong className="gold-text">{email}</strong>. Click it to activate your free account — then you&apos;ll unlock the <strong className="gold-text">Astral Threads</strong> layer and get <strong className="gold-text">one free Decan Engine add-on</strong> each month.
+                    {nextPath === "/subscribe" && " We'll bring you right back to the subscription page to finish upgrading."}
                   </p>
                   <p className="muted" style={{ fontSize: "0.82rem", fontFamily: "var(--font-ui)", marginBottom: "1.5rem" }}>
                     Didn&apos;t get it? Check spam, or <button onClick={() => { setConfirmEmail(false); }} style={{ background: "none", border: "none", color: "var(--brass-bright)", cursor: "pointer", textDecoration: "underline", fontFamily: "inherit", fontSize: "inherit" }}>try again</button>.
@@ -124,16 +134,22 @@ export default function SignupPage() {
                 <>
                   <h1 style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>You&apos;re in!</h1>
                   <p className="muted" style={{ marginBottom: "1.5rem" }}>
-                    Welcome to TarotByte, seeker. You&apos;ve unlocked the <strong className="gold-text">Celestial</strong> layer — every card now reveals its zodiac sign & ruling planet. As a member you also get <strong className="gold-text">one free Decan Engine add-on</strong> each month.
+                    Welcome to TarotByte, seeker. You&apos;ve unlocked the <strong className="gold-text">Astral Threads</strong> layer — every card now reveals its zodiac sign & ruling planet. As a member you also get <strong className="gold-text">one free Decan Engine add-on</strong> each month.
                   </p>
                 </>
               )}
               <div className="stack" style={{ gap: "0.75rem" }}>
-                <Link href="/readings/energy-reading" className="btn btn-lg" style={{ justifyContent: "center" }}>
-                  Open my Energy Reading (Celestial) →
-                </Link>
+                {nextPath === "/subscribe" ? (
+                  <Link href="/subscribe" className="btn btn-lg" style={{ justifyContent: "center" }}>
+                    Continue to subscription plans →
+                  </Link>
+                ) : (
+                  <Link href="/readings/energy-reading" className="btn btn-lg" style={{ justifyContent: "center" }}>
+                    Open my Energy Reading →
+                  </Link>
+                )}
                 <Link href="/readings/past-present-future" className="btn" style={{ justifyContent: "center", background: "transparent", border: "1px solid var(--brass)", color: "var(--brass-bright)" }}>
-                  Try Past · Present · Future (Celestial) →
+                  Try Past · Present · Future →
                 </Link>
               </div>
               <div className="divider" style={{ margin: "1.5rem 0" }} />
