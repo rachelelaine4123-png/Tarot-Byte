@@ -31,7 +31,7 @@ export default function SignupPage() {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback?next=/readings`,
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=/auth/success`,
         },
       });
       if (signUpError) {
@@ -93,6 +93,9 @@ export default function SignupPage() {
               </form>
               <p className="muted center" style={{ fontSize: "0.8rem", marginTop: "1.25rem", fontFamily: "var(--font-ui)" }}>
                 Paid spreads (Celtic Cross, Horseshoe, 5-Card V) & astrology overlays coming soon.
+              </p>
+              <p className="muted center" style={{ fontSize: "0.85rem", marginTop: "0.75rem", fontFamily: "var(--font-ui)" }}>
+                Already have an account? <Link href="/signin" style={{ color: "var(--brass-bright)", textDecoration: "underline" }}>Sign in</Link>
               </p>
             </>
           ) : (

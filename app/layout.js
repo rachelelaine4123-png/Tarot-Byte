@@ -3,7 +3,7 @@ import "./globals.css";
 export const metadata = {
   title: "TarotByte — Digital Tarot with a Celestial Twist",
   description:
-    "Free tarot readings, an original astrology-powered oracle, and your signature Energy Reading. Bite-sized wisdom for the modern seeker.",
+    "Free tarot readings, an original astrology-powered Astral Threads deck, and your signature Energy Reading. Bite-sized wisdom for the modern seeker.",
 };
 
 export default function RootLayout({ children }) {

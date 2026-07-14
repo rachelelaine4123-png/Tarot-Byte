@@ -33,7 +33,7 @@ export default function AccountNav() {
 
   if (!account.signedIn) {
     return (
-      <Link href="/signup" className="btn btn-ghost" style={{ padding: "0.55rem 1.1rem", fontSize: "0.88rem" }}>
+      <Link href="/signin" className="btn btn-ghost" style={{ padding: "0.55rem 1.1rem", fontSize: "0.88rem" }}>
         Sign in
       </Link>
     );

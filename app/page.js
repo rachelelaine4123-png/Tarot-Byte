@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Nav from "./components/Nav";
+import SpreadCard from "./components/SpreadCard";
 import { SPREADS } from "@/lib/readingEngine";
 import { asset } from "@/lib/asset";
 
@@ -10,7 +11,7 @@ export default function Home() {
 
       {/* Hero */}
       <header className="container" style={{ paddingTop: "3.5rem", paddingBottom: "2rem", textAlign: "center" }}>
-        <div className="eyebrow" style={{ animation: "fadeUp 0.6s ease both" }}>Digital tarot · celestial oracle · your energy, decoded</div>
+        <div className="eyebrow" style={{ animation: "fadeUp 0.6s ease both" }}>Digital tarot · celestial insight · your energy, decoded</div>
         <h1 style={{ fontSize: "clamp(2.6rem, 6vw, 4.5rem)", margin: "1rem 0", animation: "fadeUp 0.7s ease 0.05s both" }}>
           Bite-sized wisdom<br />from the <span className="gold-text">cosmos</span>.
         </h1>
@@ -25,7 +26,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Floating oracle preview */}
+      {/* Floating Astral Threads preview */}
       <section className="container" style={{ padding: "1.5rem 0 3rem" }}>
         <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>
           {["leo", "scorpio", "aquarius", "pisces", "sagittarius"].map((sign, i) => (
@@ -53,27 +54,9 @@ export default function Home() {
           <div className="eyebrow">Choose your spread</div>
           <h2 style={{ fontSize: "2.2rem", marginTop: "0.5rem" }}>Readings for every question</h2>
         </div>
-        <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
+        <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", alignItems: "stretch" }}>
           {Object.values(SPREADS).map((s) => (
-            <Link key={s.id} href={`/readings/${s.id}`} className="panel" style={{
-              padding: "1.75rem", display: "block", transition: "transform 0.2s, box-shadow 0.2s",
-            }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
-                <h3 style={{ fontSize: "1.35rem" }}>{s.name}</h3>
-                <span style={{
-                  fontFamily: "var(--font-ui)", fontSize: "0.68rem", letterSpacing: "0.1em",
-                  textTransform: "uppercase", padding: "0.25rem 0.65rem", borderRadius: "999px",
-                  border: `1px solid ${s.tier === "free" ? "var(--arcane-dim)" : "var(--brass)"}`,
-                  color: s.tier === "free" ? "var(--arcane)" : "var(--brass-bright)",
-                }}>
-                  {s.tier === "free" ? "Free" : "Members"}
-                </span>
-              </div>
-              <p className="muted" style={{ fontSize: "0.95rem" }}>{s.description}</p>
-              <div style={{ marginTop: "1rem", color: "var(--brass-bright)", fontFamily: "var(--font-ui)", fontSize: "0.9rem" }}>
-                {s.cards} card{s.cards > 1 ? "s" : ""}{s.usesOracle ? " + oracle" : ""} · Draw now →
-              </div>
-            </Link>
+            <SpreadCard key={s.id} s={s} />
           ))}
         </div>
       </section>
@@ -83,7 +66,7 @@ export default function Home() {
         <div className="panel" style={{ padding: "2.5rem", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem", alignItems: "center" }}>
           <div>
             <div className="eyebrow">The TarotByte difference</div>
-            <h2 style={{ fontSize: "2rem", margin: "0.5rem 0 1rem" }}>An oracle that&apos;s truly ours</h2>
+            <h2 style={{ fontSize: "2rem", margin: "0.5rem 0 1rem" }}>The <span className="gold-text">Astral Threads</span> — ours alone</h2>
             <p className="muted" style={{ marginBottom: "1rem" }}>
               Most tarot sites stop at the cards. TarotByte layers in the <strong style={{ color: "var(--arcane)" }}>Astral Threads</strong> —
               an original 12-sign celestial deck that clarifies the energy behind every reading.
@@ -95,8 +78,35 @@ export default function Home() {
             </p>
             <Link href="/oracle" className="btn" style={{ marginTop: "1.5rem" }}>Meet the Astral Threads →</Link>
           </div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={asset("/oracle/capricorn.png")} alt="Astral Threads" style={{ width: "100%", borderRadius: "12px", border: "1px solid var(--brass)", boxShadow: "var(--glow-brass)" }} />
+          {/* Fanned-out Astral Threads cards with Capricorn in front */}
+          <div style={{ position: "relative", height: "380px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            {["aries", "taurus", "gemini", "cancer", "leo", "virgo", "libra", "scorpio", "sagittarius", "capricorn", "aquarius", "pisces"].map((sign, i) => {
+              const isFront = sign === "capricorn";
+              const offset = i - 10; // center around capricorn (index 10)
+              return (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  key={sign}
+                  src={asset(`/oracle/${sign}.png`)}
+                  alt={sign}
+                  style={{
+                    position: "absolute",
+                    width: isFront ? "180px" : "160px",
+                    borderRadius: "10px",
+                    border: "1px solid var(--brass)",
+                    boxShadow: isFront ? "var(--glow-brass)" : "0 4px 20px rgba(0,0,0,0.6)",
+                    transform: isFront
+                      ? "translateY(0px) rotate(0deg)"
+                      : `translate(${offset * 8}px, ${Math.abs(offset) * 6}px) rotate(${offset * 4}deg)`,
+                    zIndex: isFront ? 12 : 10 - Math.abs(offset),
+                    opacity: isFront ? 1 : 0.85,
+                    transition: "transform 0.3s ease",
+                    objectFit: "cover",
+                  }}
+                />
+              );
+            })}
+          </div>
         </div>
       </section>
 
@@ -127,7 +137,7 @@ export default function Home() {
           <div style={{ fontFamily: "var(--font-display)", fontSize: "1.1rem", color: "var(--ink)", marginBottom: "0.5rem" }}>
             Tarot<span className="gold-text">Byte</span>
           </div>
-          © {new Date().getFullYear()} TarotByte · Readings are for reflection & entertainment · Original art & oracle system © TarotByte
+          © {new Date().getFullYear()} TarotByte · Readings are for reflection & entertainment · Original art & Astral Threads system © TarotByte
         </div>
       </footer>
     </>

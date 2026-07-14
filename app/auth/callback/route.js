@@ -1,7 +1,7 @@
 // /auth/callback — Supabase OAuth / email-confirmation landing route.
 // Supabase redirects here with a `code` query param after the user clicks
 // the confirmation link in their email. We exchange the code for a session,
-// then redirect to /readings (or wherever they were heading).
+// then redirect to a success page (or wherever they were heading).
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
@@ -9,7 +9,7 @@ import { cookies } from "next/headers";
 export async function GET(request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
-  const next = requestUrl.searchParams.get("next") || "/readings";
+  const next = requestUrl.searchParams.get("next") || "/auth/success";
 
   if (code) {
     const cookieStore = await cookies();
@@ -32,6 +32,6 @@ export async function GET(request) {
     await supabase.auth.exchangeCodeForSession(code);
   }
 
-  // Redirect to the reading page (or the `next` param).
+  // Redirect to the success page (or the `next` param).
   return NextResponse.redirect(`${requestUrl.origin}${next}`);
 }
