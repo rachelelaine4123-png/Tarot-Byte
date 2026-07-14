@@ -53,6 +53,9 @@ export default function Home() {
           <Link href="/readings/yes-no" className="btn btn-lg">Try a free reading ✦</Link>
           <Link href="/signup" className="btn btn-ghost btn-lg">Unlock your Energy Reading</Link>
         </div>
+        <p className="muted" style={{ fontSize: "0.85rem", marginTop: "1.25rem", fontFamily: "var(--font-ui)" }}>
+          Want the deepest layer? <Link href="/subscribe" style={{ color: "var(--brass-bright)", textDecoration: "underline", textUnderlineOffset: "2px" }}>See subscription plans →</Link>
+        </p>
       </header>
 
       {/* Floating Astral Threads preview */}
@@ -147,9 +150,9 @@ export default function Home() {
           <p className="muted" style={{ maxWidth: 480, margin: "0 auto 1.5rem" }}>
             A short, soulful weekly reading + the cosmic energy ahead. No noise, just signal.
           </p>
-          <form action={asset("/signup")} style={{ display: "flex", gap: "0.6rem", justifyContent: "center", flexWrap: "wrap", maxWidth: 460, margin: "0 auto" }}>
+          <form method="get" action="/signup" style={{ display: "flex", gap: "0.6rem", justifyContent: "center", flexWrap: "wrap", maxWidth: 460, margin: "0 auto" }}>
             <input
-              type="email" placeholder="you@stardust.com" required
+              type="email" name="email" placeholder="you@stardust.com" required
               style={{
                 flex: "1 1 240px", padding: "0.85rem 1.1rem", background: "var(--bg-deep)",
                 border: "1px solid var(--border)", borderRadius: "999px", color: "var(--ink)",

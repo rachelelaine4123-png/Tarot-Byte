@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Nav from "../components/Nav";
 import Link from "next/link";
 import { useAccount } from "@/lib/useAccount";
@@ -12,6 +12,15 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [confirmEmail, setConfirmEmail] = useState(false);
   const account = useAccount();
+
+  // Pre-fill email if arriving from the homepage newsletter form (?email=...)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const prefill = params.get("email");
+      if (prefill) setEmail(prefill);
+    }
+  }, []);
 
   async function submit(e) {
     e.preventDefault();
