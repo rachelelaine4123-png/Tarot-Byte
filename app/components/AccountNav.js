@@ -41,9 +41,14 @@ export default function AccountNav() {
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-      <span className="muted" style={{ fontSize: "0.82rem", maxWidth: 140, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={account.email}>
+      <Link
+        href="/dashboard"
+        className="muted"
+        style={{ fontSize: "0.82rem", maxWidth: 140, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+        title={`${account.email} — My Dashboard`}
+      >
         {account.email}
-      </span>
+      </Link>
       {account.tier === "subscriber" && (
         <span style={{ fontFamily: "var(--font-ui)", fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--brass-bright)", border: "1px solid var(--brass)", padding: "0.15rem 0.5rem", borderRadius: "999px" }}>
           ✦ Sub

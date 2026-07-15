@@ -30,6 +30,7 @@ export default function Footer() {
           <Link href="/oracle">Astral Threads</Link>
           <Link href="/guide">How it works</Link>
           <Link href="/subscribe">Subscribe</Link>
+          <Link href="/dashboard">My Dashboard</Link>
           <Link href="/signup">Sign up free</Link>
           <Link href="/signin">Sign in</Link>
         </div>
