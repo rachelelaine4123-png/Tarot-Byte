@@ -155,7 +155,31 @@ export default function Reading({ spreadId, locked = false }) {
       const result = generateReading({ spreadId, context, tier: useTier });
       setReading(result);
       setPhase("revealed");
+      // Fire-and-forget save — never blocks the UI
+      saveReading(result, spreadId, context, useTier);
     }, 1300);
+  }
+
+  // Silently persist Z/D readings. Guests + T tier are skipped server-side.
+  function saveReading(result, sid, ctx, t) {
+    try {
+      fetch("/api/readings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          spreadId: sid,
+          context: ctx,
+          tier: t,
+          verdict: result.verdict ?? null,
+          cards_json: {
+            cards: result.cards,
+            oracle: result.oracle ?? null,
+            interpretation: result.interpretation,
+            tone: result.tone ?? null,
+          },
+        }),
+      }).catch(() => {});
+    } catch {}
   }
 
   function selectTier(key) {
@@ -210,22 +234,39 @@ export default function Reading({ spreadId, locked = false }) {
         {spread.contexts && (
           <div style={{ marginTop: "1.25rem" }}>
             <label style={labelStyle}>Focus Area</label>
-            <div style={{ display: "flex", gap: "0.6rem", marginTop: "0.5rem", flexWrap: "wrap" }}>
-              {spread.contexts.map((c) => (
-                <button
-                  key={c}
-                  onClick={() => setContext(c)}
-                  className="btn"
-                  style={{
-                    padding: "0.5rem 1.1rem", fontSize: "0.85rem",
-                    background: context === c ? undefined : "transparent",
-                    color: context === c ? undefined : "var(--ink-dim)",
-                    border: context === c ? undefined : "1px solid var(--border)",
-                  }}
-                >
-                  {c}
-                </button>
-              ))}
+            <div style={{ display: "flex", gap: "0.55rem", marginTop: "0.6rem", flexWrap: "wrap" }}>
+              {spread.contexts.map((c) => {
+                const active = context === c;
+                const ICONS = { Love: "♡", Career: "⚙", Fortune: "✦", General: "◎" };
+                const icon = ICONS[c] ?? "✦";
+                return (
+                  <button
+                    key={c}
+                    onClick={() => setContext(c)}
+                    aria-pressed={active}
+                    style={{
+                      display: "inline-flex", alignItems: "center", gap: "0.4rem",
+                      padding: "0.45rem 1rem",
+                      fontFamily: "var(--font-ui)", fontSize: "0.85rem", letterSpacing: "0.04em",
+                      borderRadius: "999px", cursor: "pointer", transition: "all 0.18s ease",
+                      background: active
+                        ? "linear-gradient(135deg, var(--brass) 0%, var(--brass-bright) 100%)"
+                        : "transparent",
+                      color: active ? "#1a1408" : "var(--ink-dim)",
+                      border: active ? "1px solid var(--brass-bright)" : "1px solid var(--border)",
+                      boxShadow: active ? "0 0 12px rgba(212,162,76,0.4)" : "none",
+                      fontWeight: active ? 600 : 400,
+                    }}
+                  >
+                    <span style={{
+                      fontSize: "0.88rem",
+                      color: active ? "#1a1408" : "var(--brass-bright)",
+                      lineHeight: 1,
+                    }}>{icon}</span>
+                    {c}
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
@@ -579,36 +620,97 @@ function CardSlot({ label, card, shuffling, delay }) {
   return (
     <div style={{ textAlign: "center" }}>
       <div style={{
-        aspectRatio: "0.57", borderRadius: "12px", overflow: "hidden",
-        border: "1px solid var(--brass)", boxShadow: "var(--glow-brass)",
-        position: "relative", background: "var(--bg-deep)",
+        aspectRatio: "2/3",
+        borderRadius: "12px",
+        overflow: "hidden",
+        border: `1px solid ${revealed ? "var(--brass-bright)" : "var(--brass)"}`,
+        boxShadow: revealed ? "var(--glow-brass)" : "0 4px 20px rgba(0,0,0,0.5)",
+        position: "relative",
+        background: "var(--bg-deep)",
         animation: shuffling ? "pulse 0.9s ease-in-out infinite" : `float 0.5s ease ${delay}ms both`,
+        transition: "border-color 0.3s ease, box-shadow 0.3s ease",
       }}>
         {revealed ? (
-          <div style={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", padding: "0.75rem" }}>
-            <div style={{ fontFamily: "var(--font-display)", fontSize: "1.05rem", color: "var(--brass-bright)", lineHeight: 1.2 }}>
-              {card.name}
+          <div style={{
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            padding: "0.85rem 0.75rem",
+            background: "linear-gradient(180deg, rgba(212,162,76,0.06) 0%, var(--bg-deep) 40%)",
+          }}>
+            {/* Top — glyph */}
+            <div style={{ textAlign: "center" }}>
+              {card.celestial?.glyph && (
+                <div style={{ fontSize: "1.4rem", color: "var(--arcane)", lineHeight: 1 }}>
+                  {card.celestial.glyph}
+                </div>
+              )}
             </div>
-            {card.reversed && (
-              <div style={{ fontSize: "0.7rem", color: "var(--rose)", fontFamily: "var(--font-ui)", letterSpacing: "0.1em", marginTop: "0.35rem" }}>
-                ↺ REVERSED
+
+            {/* Middle — card name */}
+            <div style={{ textAlign: "center" }}>
+              <div style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "clamp(0.82rem, 1.6vw, 1.05rem)",
+                color: "var(--brass-bright)",
+                lineHeight: 1.25,
+                letterSpacing: "0.02em",
+              }}>
+                {card.name}
               </div>
-            )}
-            {card.celestial?.glyph && (
-              <div style={{ fontSize: "1.1rem", color: "var(--arcane)", marginTop: "0.4rem" }}>
-                {card.celestial.glyph}
-              </div>
-            )}
-            <div style={{ fontSize: "0.8rem", color: "var(--ink-dim)", marginTop: "0.5rem", fontFamily: "var(--font-body)" }}>
-              {card.reversed ? card.reversedMeaning : card.upright}
+              {card.reversed && (
+                <div style={{
+                  fontSize: "0.62rem",
+                  color: "var(--rose)",
+                  fontFamily: "var(--font-ui)",
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  marginTop: "0.3rem",
+                }}>
+                  ↺ Reversed
+                </div>
+              )}
+            </div>
+
+            {/* Bottom — meaning snippet */}
+            <div style={{
+              fontSize: "clamp(0.68rem, 1.2vw, 0.78rem)",
+              color: "var(--ink-dim)",
+              fontFamily: "var(--font-body)",
+              lineHeight: 1.45,
+              textAlign: "center",
+              borderTop: "1px solid rgba(212,162,76,0.2)",
+              paddingTop: "0.5rem",
+            }}>
+              {(card.reversed ? card.reversedMeaning : card.upright).slice(0, 80)}
+              {(card.reversed ? card.reversedMeaning : card.upright).length > 80 ? "…" : ""}
             </div>
           </div>
         ) : (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={asset("/oracle/card-back.png")} alt="card back" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <img
+            src={asset("/oracle/card-back.png")}
+            alt=""
+            aria-hidden="true"
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "center",
+              display: "block",
+            }}
+          />
         )}
       </div>
-      <div style={{ marginTop: "0.6rem", fontFamily: "var(--font-ui)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--ink-dim)" }}>
+      <div style={{
+        marginTop: "0.6rem",
+        fontFamily: "var(--font-ui)",
+        fontSize: "0.75rem",
+        letterSpacing: "0.1em",
+        textTransform: "uppercase",
+        color: "var(--ink-dim)",
+      }}>
         {label}
       </div>
     </div>
@@ -620,22 +722,64 @@ function OracleSlot({ oracle, shuffling, delay }) {
   return (
     <div style={{ textAlign: "center" }}>
       <div style={{
-        aspectRatio: "0.57", borderRadius: "12px", overflow: "hidden",
-        border: "1px solid var(--arcane)", boxShadow: "var(--glow-arcane)",
-        position: "relative", background: "var(--bg-deep)",
+        aspectRatio: "2/3",
+        borderRadius: "12px",
+        overflow: "hidden",
+        border: "1px solid var(--arcane)",
+        boxShadow: "var(--glow-arcane)",
+        position: "relative",
+        background: "var(--bg-deep)",
         animation: shuffling ? "pulse 0.9s ease-in-out infinite" : `float 0.5s ease ${delay}ms both`,
       }}>
         {revealed ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={asset(oracle.image)} alt={oracle.sign} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <img
+            src={asset(oracle.image)}
+            alt={`${oracle.sign} — ${oracle.keyword}`}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "center top",
+              display: "block",
+            }}
+          />
         ) : (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={asset("/oracle/card-back.png")} alt="card back" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <img
+            src={asset("/oracle/card-back.png")}
+            alt=""
+            aria-hidden="true"
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "center",
+              display: "block",
+            }}
+          />
         )}
       </div>
-      <div style={{ marginTop: "0.6rem", fontFamily: "var(--font-ui)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--arcane)" }}>
+      <div style={{
+        marginTop: "0.6rem",
+        fontFamily: "var(--font-ui)",
+        fontSize: "0.78rem",
+        letterSpacing: "0.08em",
+        textTransform: "uppercase",
+        color: "var(--arcane)",
+      }}>
         Astral Threads
       </div>
+      {revealed && (
+        <div style={{
+          fontFamily: "var(--font-display)",
+          fontSize: "0.82rem",
+          color: "var(--brass-bright)",
+          marginTop: "0.2rem",
+        }}>
+          {oracle.sign} · {oracle.keyword}
+        </div>
+      )}
     </div>
   );
 }
