@@ -142,8 +142,8 @@ a:hover { color: var(--arcane); }
   50% { opacity: 1; transform: translateY(-6px); }
 }
 @keyframes float {
-  0% { opacity: 0; transform: translateY(16px) rotateY(90deg); }
-  100% { opacity: 1; transform: translateY(0) rotateY(0); }
+  0%   { opacity: 0; transform: translateY(20px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0)   scale(1); }
 }
 @keyframes fadeUp {
   0% { opacity: 0; transform: translateY(24px); }
@@ -164,6 +164,13 @@ button:hover > .tier-tip { opacity: 1 !important; visibility: visible !important
 /* Cards on top → vertical connector lines → interpretation boxes below → summary panel */
 .reading-board {
   margin-top: 2rem;
+}
+
+/* Each card slot: capped so they never go huge */
+.card-row > * {
+  max-width: 200px;
+  width: 100%;
+  margin: 0 auto;
 }
 
 /* Connector lines that visually link each card to its interpretation box */
@@ -279,7 +286,14 @@ button:hover > .tier-tip { opacity: 1 !important; visibility: visible !important
   .reading-board .card-row,
   .reading-board .connector-row,
   .reading-board .interp-row {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  /* For yes/no (1 card) and single-card spreads */
+  .reading-board .card-row.single-card {
     grid-template-columns: 1fr !important;
+  }
+  .card-row > * {
+    max-width: 160px;
   }
   .connector-line { height: 24px; }
 }
@@ -416,4 +430,118 @@ button:hover > .tier-tip { opacity: 1 !important; visibility: visible !important
   color: var(--arcane);
   font-size: 0.8rem;
   top: 0.15rem;
+}
+
+/* ============================================================
+   MOBILE — comprehensive responsive styles
+   Target: < 768px tablets, < 480px phones
+   ============================================================ */
+
+/* Nav — collapse links on mobile */
+@media (max-width: 768px) {
+  /* Hide secondary nav links, keep logo + account */
+  nav .container > div > a:not(.btn-ghost) {
+    display: none;
+  }
+  nav {
+    padding: 0.85rem 0;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Global spacing */
+  .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* Typography scale-down */
+  h1 { font-size: clamp(1.6rem, 7vw, 2.4rem) !important; }
+  h2 { font-size: clamp(1.3rem, 5vw, 1.8rem) !important; }
+
+  /* Panel padding */
+  .panel { padding: 1.25rem !important; }
+
+  /* Buttons full-width in stacked context */
+  .btn-lg { width: 100%; justify-content: center; }
+
+  /* Cards — 2-up on phones with a max */
+  .reading-board .card-row {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.75rem !important;
+  }
+  .reading-board .connector-row,
+  .reading-board .interp-row {
+    grid-template-columns: 1fr !important;
+  }
+  .card-row > * {
+    max-width: 140px;
+  }
+
+  /* Reading board summary */
+  .reading-board .interp-box {
+    padding: 0.85rem 1rem 1rem;
+  }
+
+  /* Context pill buttons wrap */
+  .context-pills {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  /* Tier ladder — stack on tiny screens */
+  .tier-ladder {
+    grid-template-columns: 1fr !important;
+    gap: 0.5rem;
+  }
+
+  /* Dashboard stat cards — full width */
+  .dashboard-stats {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Oracle / Astral Threads card — slightly smaller */
+  .oracle-slot {
+    max-width: 160px;
+    margin: 0 auto;
+  }
+
+  /* Subscribe page */
+  .subscribe-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Footer */
+  .site-footer .footer-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Nav AccountNav — hide email, show icon only */
+  .account-email-label {
+    display: none !important;
+  }
+}
+
+/* Tablet — 641px to 768px */
+@media (min-width: 641px) and (max-width: 768px) {
+  .reading-board .card-row {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1rem !important;
+  }
+  .reading-board .connector-row,
+  .reading-board .interp-row {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .card-row > * {
+    max-width: 180px;
+  }
+  .dashboard-stats {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* Prevent horizontal scroll globally */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
 }

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your TarotByte Receipt ✦</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap');
+    body { margin:0; padding:0; background-color:#0d0e14; }
+    a { color:#d4a24c; }
+    .btn-link { display:inline-block; background:linear-gradient(135deg,#a07828 0%,#d4a24c 100%); color:#0d0e14 !important; text-decoration:none !important; padding:13px 28px; border-radius:8px; font-family:'Cinzel',Georgia,serif; font-size:14px; font-weight:700; letter-spacing:0.06em; }
+    @media only screen and (max-width:600px) {
+      .email-container { width:100% !important; }
+      .mobile-padding { padding:24px 20px !important; }
+    }
+  </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body style="background-color:#0d0e14; margin:0; padding:0;">
+
+  <div style="display:none;font-size:1px;color:#0d0e14;line-height:1px;max-height:0;overflow:hidden;">
+    Receipt for {{PRODUCT_NAME}} — Thank you ✦
+  </div>
+
+  <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color:#0d0e14;">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+        <table class="email-container" role="presentation" cellpadding="0" cellspacing="0" width="600" style="max-width:600px; background-color:#13141c; border:1px solid #2a2b38; border-radius:16px; overflow:hidden;">
+
+          <!-- Header -->
+          <tr>
+            <td align="center" style="background:linear-gradient(180deg,#0d0e14 0%,#13141c 100%); padding:36px 40px 24px; border-bottom:1px solid #2a2b38;">
+              <img src="https://tarotbyte.app/tb-logo-cosmic.png" alt="TarotByte" width="72" height="72" style="display:block; margin:0 auto 14px; border-radius:10px;" />
+              <div style="font-family:'Cinzel',Georgia,serif; font-size:24px; font-weight:700; color:#f0e6cc; letter-spacing:0.05em;">
+                Tarot<span style="color:#d4a24c;">Byte</span>
+              </div>
+              <div style="font-family:Georgia,serif; font-size:13px; color:#9a9ab5; margin-top:8px; letter-spacing:0.12em; text-transform:uppercase;">
+                RECEIPT
+              </div>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:0; line-height:0;">
+              <div style="height:3px; background:linear-gradient(90deg,transparent 0%,#d4a24c 50%,transparent 100%);"></div>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td class="mobile-padding" style="padding:36px 48px 28px;">
+              <h2 style="font-family:'Cinzel',Georgia,serif; font-size:22px; color:#f0e6cc; margin:0 0 6px; font-weight:600;">
+                Thank you{{#if FIRST_NAME}}, {{FIRST_NAME}}{{/if}}. ✦
+              </h2>
+              <p style="font-family:Georgia,serif; font-size:15px; color:#9a9ab5; margin:0 0 28px; line-height:1.65; font-style:italic;">
+                Your payment was received and your account has been updated.
+              </p>
+
+              <!-- Receipt table -->
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border:1px solid #2a2b38; border-radius:10px; overflow:hidden; margin-bottom:28px;">
+                <tr>
+                  <td colspan="2" style="background:#1a1b27; padding:14px 20px; border-bottom:1px solid #2a2b38;">
+                    <span style="font-family:'Cinzel',Georgia,serif; font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:#d4a24c; font-weight:600;">ORDER SUMMARY</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-family:Georgia,serif; font-size:14px; color:#c8c9dc; padding:14px 20px; border-bottom:1px solid #2a2b38; width:60%;">
+                    {{PRODUCT_NAME}}
+                  </td>
+                  <td style="font-family:'Cinzel',Georgia,serif; font-size:14px; color:#d4a24c; padding:14px 20px; border-bottom:1px solid #2a2b38; text-align:right; font-weight:600;">
+                    {{PRODUCT_PRICE}}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-family:Georgia,serif; font-size:13px; color:#6b6b8a; padding:12px 20px; border-bottom:1px solid #2a2b38;">
+                    Order ID
+                  </td>
+                  <td style="font-family:Georgia,serif; font-size:13px; color:#9a9ab5; padding:12px 20px; border-bottom:1px solid #2a2b38; text-align:right;">
+                    {{ORDER_ID}}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-family:Georgia,serif; font-size:13px; color:#6b6b8a; padding:12px 20px; border-bottom:1px solid #2a2b38;">
+                    Date
+                  </td>
+                  <td style="font-family:Georgia,serif; font-size:13px; color:#9a9ab5; padding:12px 20px; border-bottom:1px solid #2a2b38; text-align:right;">
+                    {{ORDER_DATE}}
+                  </td>
+                </tr>
+                {{#if RENEWAL_DATE}}
+                <tr>
+                  <td style="font-family:Georgia,serif; font-size:13px; color:#6b6b8a; padding:12px 20px;">
+                    Next renewal
+                  </td>
+                  <td style="font-family:Georgia,serif; font-size:13px; color:#9a9ab5; padding:12px 20px; text-align:right;">
+                    {{RENEWAL_DATE}}
+                  </td>
+                </tr>
+                {{/if}}
+              </table>
+
+              <!-- What's activated -->
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:rgba(212,162,76,0.07); border:1px solid rgba(212,162,76,0.2); border-left:3px solid #d4a24c; border-radius:0 10px 10px 0; margin-bottom:32px;">
+                <tr>
+                  <td style="padding:18px 22px;">
+                    <div style="font-family:'Cinzel',Georgia,serif; font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:#d4a24c; font-weight:600; margin-bottom:10px;">
+                      NOW ACTIVE ON YOUR ACCOUNT
+                    </div>
+                    <p style="font-family:Georgia,serif; font-size:14px; color:#c8c9dc; margin:0; line-height:1.7;">
+                      {{ACTIVATION_DESCRIPTION}}
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- CTA -->
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td align="center">
+                    <a href="https://tarotbyte.app/readings/energy-reading" class="btn-link">
+                      Use it now ✦
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:0; line-height:0;">
+              <div style="height:1px; background:#2a2b38;"></div>
+            </td>
+          </tr>
+          <tr>
+            <td class="mobile-padding" style="padding:22px 48px; background-color:#0d0e14;">
+              <p style="font-family:Georgia,serif; font-size:12px; color:#6b6b8a; margin:0; line-height:1.7;">
+                Questions? Reply to this email or contact us at <a href="mailto:hello@tarotbyte.app" style="color:#6b6b8a;">hello@tarotbyte.app</a><br />
+                <a href="https://tarotbyte.app/dashboard" style="color:#6b6b8a;">Manage your account</a> &nbsp;·&nbsp;
+                <a href="https://tarotbyte.app/privacy" style="color:#6b6b8a;">Privacy Policy</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

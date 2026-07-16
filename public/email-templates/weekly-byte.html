@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Weekly Byte — TarotByte ✦</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&display=swap');
+    body { margin:0; padding:0; background-color:#0d0e14; }
+    a { color:#d4a24c; text-decoration:underline; }
+    .btn-link { display:inline-block; background:linear-gradient(135deg,#a07828 0%,#d4a24c 100%); color:#0d0e14 !important; text-decoration:none !important; padding:13px 28px; border-radius:8px; font-family:'Cinzel',Georgia,serif; font-size:14px; font-weight:700; letter-spacing:0.06em; }
+    @media only screen and (max-width:600px) {
+      .email-container { width:100% !important; }
+      .mobile-padding { padding:28px 20px !important; }
+      h1 { font-size:24px !important; }
+      .two-col td { display:block !important; width:100% !important; }
+    }
+  </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body style="background-color:#0d0e14; margin:0; padding:0;">
+
+  <!-- Preheader -->
+  <div style="display:none;font-size:1px;color:#0d0e14;line-height:1px;max-height:0;overflow:hidden;">
+    ✦ This week's celestial dispatch — {{WEEK_THEME}}
+  </div>
+
+  <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color:#0d0e14;">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+        <table class="email-container" role="presentation" cellpadding="0" cellspacing="0" width="600" style="max-width:600px; background-color:#13141c; border:1px solid #2a2b38; border-radius:16px; overflow:hidden;">
+
+          <!-- Masthead -->
+          <tr>
+            <td align="center" style="background:linear-gradient(180deg,#0d0e14 0%,#13141c 100%); padding:36px 40px 20px; border-bottom:1px solid #2a2b38;">
+              <img src="https://tarotbyte.app/tb-logo-teal.png" alt="TarotByte" width="72" height="72" style="display:block; margin:0 auto 14px; border-radius:10px;" />
+              <div style="font-family:'Cinzel',Georgia,serif; font-size:11px; letter-spacing:0.3em; text-transform:uppercase; color:#5ce1e6;">THE WEEKLY BYTE</div>
+              <h1 style="font-family:'Cinzel',Georgia,serif; font-size:28px; font-weight:700; color:#f0e6cc; margin:10px 0 4px; letter-spacing:0.02em;">
+                {{WEEK_THEME}}
+              </h1>
+              <p style="font-family:Georgia,serif; font-size:13px; color:#6b6b8a; margin:0; letter-spacing:0.1em;">
+                {{ISSUE_DATE}} &nbsp;·&nbsp; Issue #{{ISSUE_NUMBER}}
+              </p>
+            </td>
+          </tr>
+
+          <!-- Gradient rule -->
+          <tr>
+            <td style="padding:0; line-height:0;">
+              <div style="height:3px; background:linear-gradient(90deg,transparent 0%,#5ce1e6 30%,#d4a24c 70%,transparent 100%);"></div>
+            </td>
+          </tr>
+
+          <!-- This week's energy -->
+          <tr>
+            <td class="mobile-padding" style="padding:36px 48px 28px;">
+              <div style="font-family:'Cinzel',Georgia,serif; font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:#5ce1e6; font-weight:600; margin-bottom:14px;">
+                ✦ THIS WEEK'S ENERGY
+              </div>
+              <p style="font-family:Georgia,'IM Fell English',serif; font-size:17px; color:#c8c9dc; margin:0 0 16px; line-height:1.75; font-style:italic;">
+                {{OPENING_PARAGRAPH}}
+              </p>
+              <p style="font-family:Georgia,serif; font-size:15px; color:#c8c9dc; margin:0 0 20px; line-height:1.75;">
+                {{BODY_PARAGRAPH}}
+              </p>
+            </td>
+          </tr>
+
+          <!-- Card of the week -->
+          <tr>
+            <td style="padding:0 48px 28px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:rgba(212,162,76,0.07); border:1px solid rgba(212,162,76,0.2); border-left:3px solid #d4a24c; border-radius:0 10px 10px 0;">
+                <tr>
+                  <td style="padding:20px 22px;">
+                    <div style="font-family:'Cinzel',Georgia,serif; font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:#d4a24c; font-weight:600; margin-bottom:8px;">
+                      CARD OF THE WEEK
+                    </div>
+                    <div style="font-family:'Cinzel',Georgia,serif; font-size:18px; color:#f0e6cc; font-weight:700; margin-bottom:6px;">
+                      {{CARD_NAME}}
+                    </div>
+                    <div style="font-family:Georgia,serif; font-size:12px; color:#9a9ab5; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:12px;">
+                      {{CARD_CELESTIAL}} &nbsp;·&nbsp; {{CARD_DECAN}}
+                    </div>
+                    <p style="font-family:Georgia,serif; font-size:14px; color:#c8c9dc; margin:0; line-height:1.7;">
+                      {{CARD_MEANING}}
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Celestial weather -->
+          <tr>
+            <td style="padding:0 48px 28px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:rgba(92,225,230,0.05); border:1px solid rgba(92,225,230,0.15); border-left:3px solid #5ce1e6; border-radius:0 10px 10px 0;">
+                <tr>
+                  <td style="padding:20px 22px;">
+                    <div style="font-family:'Cinzel',Georgia,serif; font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:#5ce1e6; font-weight:600; margin-bottom:8px;">
+                      ASTRAL WEATHER THIS WEEK
+                    </div>
+                    <p style="font-family:Georgia,serif; font-size:14px; color:#c8c9dc; margin:0; line-height:1.7;">
+                      {{ASTRAL_WEATHER}}
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- CTA -->
+          <tr>
+            <td align="center" style="padding:4px 48px 40px;">
+              <p style="font-family:Georgia,serif; font-size:15px; color:#c8c9dc; margin:0 0 22px; line-height:1.7;">
+                {{CTA_COPY}}
+              </p>
+              <a href="https://tarotbyte.app/readings/energy-reading" class="btn-link">
+                Draw This Week's Reading ✦
+              </a>
+            </td>
+          </tr>
+
+          <!-- Divider -->
+          <tr>
+            <td style="padding:0 48px;">
+              <div style="height:1px; background:#2a2b38;"></div>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td class="mobile-padding" style="padding:24px 48px; background-color:#0d0e14;">
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td style="font-family:Georgia,serif; font-size:12px; color:#6b6b8a; line-height:1.7;">
+                    <strong style="color:#9a9ab5;">The Weekly Byte</strong> by TarotByte<br />
+                    Celestial mechanics for the modern seeker.<br />
+                    For reflection &amp; entertainment only.<br /><br />
+                    <a href="https://tarotbyte.app/dashboard" style="color:#6b6b8a;">Dashboard</a> &nbsp;·&nbsp;
+                    <a href="https://tarotbyte.app/privacy" style="color:#6b6b8a;">Privacy</a> &nbsp;·&nbsp;
+                    <a href="{{unsubscribe_url}}" style="color:#6b6b8a;">Unsubscribe</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

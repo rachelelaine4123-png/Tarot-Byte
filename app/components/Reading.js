@@ -443,7 +443,7 @@ function OracleInterpBox({ oracle }) {
 function TierLadder({ tier, unlockLevel, decanUnlocked, onSelect }) {
   const levelOf = { T: 0, Z: 1, D: 2 };
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0.75rem", marginBottom: "1.5rem" }}>
+    <div className="tier-ladder" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0.75rem", marginBottom: "1.5rem" }}>
       {LADDER.map((l) => {
         const unlocked = l.key === "D" ? decanUnlocked : levelOf[l.key] <= unlockLevel;
         const active = tier === l.key;

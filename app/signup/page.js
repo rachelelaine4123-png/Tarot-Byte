@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Nav from "../components/Nav";
 import Link from "next/link";
 import { useAccount } from "@/lib/useAccount";
@@ -12,6 +13,7 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [confirmEmail, setConfirmEmail] = useState(false);
   const account = useAccount();
+  const router  = useRouter();
 
   // Pre-fill email if arriving from the homepage newsletter form (?email=...)
   // Capture the ?next= redirect target so we can carry it through the email
@@ -27,6 +29,13 @@ export default function SignupPage() {
       if (next && next.startsWith("/")) setNextPath(next);
     }
   }, []);
+
+  // If already signed in and not showing the post-signup screen, redirect
+  useEffect(() => {
+    if (!account.loading && account.signedIn && !confirmEmail) {
+      router.replace(nextPath || "/readings");
+    }
+  }, [account.loading, account.signedIn, confirmEmail, nextPath, router]);
 
   async function submit(e) {
     e.preventDefault();
@@ -70,6 +79,20 @@ export default function SignupPage() {
   // If already signed in (e.g. returning member), skip straight to success.
   const alreadyIn = account.signedIn && !account.loading;
   const done = confirmEmail || alreadyIn;
+
+  // Show spinner while session resolves
+  if (account.loading && !confirmEmail) {
+    return (
+      <>
+        <Nav />
+        <main className="container" style={{ maxWidth: 520, paddingTop: "4rem", textAlign: "center" }}>
+          <span className="muted" style={{ fontFamily: "var(--font-ui)", fontSize: "0.9rem" }}>
+            ✦ Checking your session…
+          </span>
+        </main>
+      </>
+    );
+  }
 
   return (
     <>
