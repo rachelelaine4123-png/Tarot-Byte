@@ -43,7 +43,7 @@ export default function AccountNav() {
     <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
       <Link
         href="/dashboard"
-        className="muted"
+        className="muted account-email-label"
         style={{ fontSize: "0.82rem", maxWidth: 140, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
         title={`${account.email} — My Dashboard`}
       >

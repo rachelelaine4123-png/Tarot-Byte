@@ -1,18 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Nav from "../components/Nav";
 import Link from "next/link";
 import { useAccount } from "@/lib/useAccount";
 
 export default function SignInPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
-  const [resetSent, setResetSent] = useState(false);
-  const [showReset, setShowReset] = useState(false);
+  const [email,      setEmail]      = useState("");
+  const [password,   setPassword]   = useState("");
+  const [busy,       setBusy]       = useState(false);
+  const [error,      setError]      = useState("");
+  const [resetSent,  setResetSent]  = useState(false);
+  const [showReset,  setShowReset]  = useState(false);
+  const [nextPath,   setNextPath]   = useState("/readings");
   const account = useAccount();
+  const router  = useRouter();
+
+  // Grab ?next= param once on mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const p = new URLSearchParams(window.location.search);
+      const n = p.get("next");
+      if (n && n.startsWith("/")) setNextPath(n);
+    }
+  }, []);
+
+  // Redirect immediately once we know they're signed in — no flash
+  useEffect(() => {
+    if (!account.loading && account.signedIn) {
+      router.replace(nextPath);
+    }
+  }, [account.loading, account.signedIn, nextPath, router]);
 
   async function submit(e) {
     e.preventDefault();
@@ -26,18 +45,15 @@ export default function SignInPage() {
         setBusy(false);
         return;
       }
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
       if (signInError) {
         setError(signInError.message);
         setBusy(false);
         return;
       }
-      // Success — refresh account state and redirect to readings.
+      // Refresh account state then navigate — avoids stale useAccount
       account.refresh();
-      window.location.href = "/readings";
+      router.replace(nextPath);
     } catch (err) {
       setError(err?.message || "Something went wrong. Please try again.");
       setBusy(false);
@@ -46,10 +62,7 @@ export default function SignInPage() {
 
   async function sendReset(e) {
     e.preventDefault();
-    if (!email) {
-      setError("Enter your email address first.");
-      return;
-    }
+    if (!email) { setError("Enter your email address first."); return; }
     setBusy(true);
     setError("");
     try {
@@ -63,11 +76,7 @@ export default function SignInPage() {
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/auth/callback?next=/auth/success`,
       });
-      if (resetError) {
-        setError(resetError.message);
-        setBusy(false);
-        return;
-      }
+      if (resetError) { setError(resetError.message); setBusy(false); return; }
       setResetSent(true);
       setBusy(false);
     } catch (err) {
@@ -76,22 +85,15 @@ export default function SignInPage() {
     }
   }
 
-  // If already signed in, redirect to readings.
-  if (account.signedIn && !account.loading) {
+  // Show spinner while resolving session — prevents form flash for signed-in users
+  if (account.loading) {
     return (
       <>
         <Nav />
-        <main className="container" style={{ maxWidth: 520, paddingTop: "3rem", paddingBottom: "5rem" }}>
-          <div className="panel" style={{ padding: "2.5rem", textAlign: "center" }}>
-            <div style={{ fontSize: "2.5rem", marginBottom: "0.75rem" }}>✦</div>
-            <h1 style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>You&apos;re already signed in</h1>
-            <p className="muted" style={{ marginBottom: "1.5rem" }}>
-              Welcome back, <strong className="gold-text">{account.email}</strong>. You&apos;re all set.
-            </p>
-            <Link href="/readings/energy-reading" className="btn btn-lg" style={{ justifyContent: "center" }}>
-              Go to my readings →
-            </Link>
-          </div>
+        <main className="container" style={{ maxWidth: 520, paddingTop: "4rem", textAlign: "center" }}>
+          <span className="muted" style={{ fontFamily: "var(--font-ui)", fontSize: "0.9rem" }}>
+            ✦ Checking your session…
+          </span>
         </main>
       </>
     );
@@ -110,7 +112,11 @@ export default function SignInPage() {
                 We&apos;ve sent a password reset link to <strong className="gold-text">{email}</strong>.
                 Click it to choose a new password.
               </p>
-              <button onClick={() => { setShowReset(false); setResetSent(false); }} className="btn" style={{ justifyContent: "center" }}>
+              <button
+                onClick={() => { setShowReset(false); setResetSent(false); }}
+                className="btn"
+                style={{ justifyContent: "center" }}
+              >
                 ← Back to sign in
               </button>
             </div>
@@ -130,12 +136,19 @@ export default function SignInPage() {
                   style={inputStyle}
                 />
                 {error && <ErrorBox message={error} />}
-                <button type="submit" className="btn btn-lg" style={{ width: "100%", justifyContent: "center" }} disabled={busy}>
+                <button
+                  type="submit" className="btn btn-lg"
+                  style={{ width: "100%", justifyContent: "center" }}
+                  disabled={busy}
+                >
                   {busy ? "Sending reset link…" : "Send reset link ✦"}
                 </button>
               </form>
               <p className="muted center" style={{ fontSize: "0.85rem", marginTop: "1.25rem", fontFamily: "var(--font-ui)" }}>
-                <button onClick={() => setShowReset(false)} style={{ background: "none", border: "none", color: "var(--brass-bright)", cursor: "pointer", textDecoration: "underline", fontFamily: "inherit", fontSize: "inherit" }}>
+                <button
+                  onClick={() => setShowReset(false)}
+                  style={{ background: "none", border: "none", color: "var(--brass-bright)", cursor: "pointer", textDecoration: "underline", fontFamily: "inherit", fontSize: "inherit" }}
+                >
                   ← Back to sign in
                 </button>
               </p>
@@ -161,16 +174,26 @@ export default function SignInPage() {
                   style={inputStyle}
                 />
                 {error && <ErrorBox message={error} />}
-                <button type="submit" className="btn btn-lg" style={{ width: "100%", justifyContent: "center" }} disabled={busy}>
+                <button
+                  type="submit" className="btn btn-lg"
+                  style={{ width: "100%", justifyContent: "center" }}
+                  disabled={busy}
+                >
                   {busy ? "Signing in…" : "Sign in ✦"}
                 </button>
               </form>
               <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1.25rem", fontFamily: "var(--font-ui)", fontSize: "0.85rem" }}>
-                <button onClick={() => setShowReset(true)} style={{ background: "none", border: "none", color: "var(--ink-dim)", cursor: "pointer", textDecoration: "underline", fontFamily: "inherit", fontSize: "inherit" }}>
+                <button
+                  onClick={() => setShowReset(true)}
+                  style={{ background: "none", border: "none", color: "var(--ink-dim)", cursor: "pointer", textDecoration: "underline", fontFamily: "inherit", fontSize: "inherit" }}
+                >
                   Forgot password?
                 </button>
                 <span className="muted">
-                  New here? <Link href="/signup" style={{ color: "var(--brass-bright)", textDecoration: "underline" }}>Create an account</Link>
+                  New here?{" "}
+                  <Link href={`/signup${nextPath !== "/readings" ? `?next=${encodeURIComponent(nextPath)}` : ""}`} style={{ color: "var(--brass-bright)", textDecoration: "underline" }}>
+                    Create an account
+                  </Link>
                 </span>
               </div>
             </>

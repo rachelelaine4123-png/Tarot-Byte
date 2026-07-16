@@ -126,7 +126,7 @@ export default function DashboardPage() {
         </div>
 
         {/* ── Status cards ── */}
-        <div style={{
+        <div className="dashboard-stats" style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))",
           gap: "1rem",
