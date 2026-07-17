@@ -131,6 +131,7 @@ export default function Reading({ spreadId, locked = false }) {
           setAddonBusy(false);
           return startCheckout(PRICING.decan.memberSingle.priceId);
         }
+        // non-ok but not 409 → still optimistically proceed (network hiccup)
       } catch {
         /* optimistic: proceed regardless */
       }
@@ -138,19 +139,32 @@ export default function Reading({ spreadId, locked = false }) {
       setTier("D");
       setAddonBusy(false);
       account.refresh();
-      // Re-derive celestial lines on EXISTING cards — no redraw.
       if (reading) {
+        // Re-derive celestial lines on EXISTING cards — no redraw.
         setReading(rederiveCelestialLines(reading, "D"));
+      } else {
+        // No reading yet — draw fresh at D tier now.
+        setPhase("shuffling");
+        setTimeout(() => {
+          const result = generateReading({ spreadId, context, tier: "D" });
+          setReading(result);
+          setPhase("revealed");
+          saveReading(result, spreadId, context, "D");
+        }, 1300);
       }
       return;
     }
+    // No free credits → paid checkout
     startCheckout(PRICING.decan.memberSingle.priceId);
   }
 
   function draw() {
     setPhase("shuffling");
     setReading(null);
-    const useTier = canUseTier(tier) ? tier : "T";
+    // Fallback ladder: D → needs decanUnlocked, Z → needs unlockLevel≥1, T always works
+    const useTier = canUseTier(tier) ? tier
+      : unlockLevel >= 1 ? "Z"
+      : "T";
     setTimeout(() => {
       const result = generateReading({ spreadId, context, tier: useTier });
       setReading(result);
@@ -183,6 +197,12 @@ export default function Reading({ spreadId, locked = false }) {
   }
 
   function selectTier(key) {
+    // If the user tries to select D but hasn't activated it yet,
+    // kick off activation instead of silently setting a locked tier.
+    if (key === "D" && !decanUnlocked) {
+      activateAddon();
+      return;
+    }
     setTier(key);
   }
 
@@ -275,9 +295,27 @@ export default function Reading({ spreadId, locked = false }) {
           {phase === "shuffling" ? "Shuffling the deck…" : reading ? "Draw again" : "Draw my cards ✦"}
         </button>
         <span className="muted" style={{ marginLeft: "1rem", fontFamily: "var(--font-ui)", fontSize: "0.8rem" }}>
-          Reading at: <strong className="gold-text">{LADDER.find(l => l.key === (canUseTier(tier) ? tier : "T")).name}</strong>
+          Reading at: <strong className="gold-text">{
+            decanUnlocked ? LADDER[2].name
+            : unlockLevel >= 1 ? LADDER[1].name
+            : LADDER[0].name
+          }</strong>
         </span>
       </div>
+
+      {/* Decan Engine add-on — show pre-draw for members so they can activate before drawing */}
+      {unlockLevel === 1 && !addonActive && phase === "idle" && (
+        <div style={{ marginBottom: "1.5rem" }}>
+          <DecanAddonCard
+            freeCredits={freeCredits}
+            busy={addonBusy}
+            onActivate={activateAddon}
+            onCheckout={startCheckout}
+            checkoutBusy={checkoutBusy}
+            checkoutError={checkoutError}
+          />
+        </div>
+      )}
 
       {/* Card display + connected interpretation boxes */}
       {phase !== "idle" && (
@@ -631,62 +669,120 @@ function CardSlot({ label, card, shuffling, delay }) {
         transition: "border-color 0.3s ease, box-shadow 0.3s ease",
       }}>
         {revealed ? (
-          <div style={{
-            height: "100%",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            padding: "0.85rem 0.75rem",
-            background: "linear-gradient(180deg, rgba(212,162,76,0.06) 0%, var(--bg-deep) 40%)",
-          }}>
-            {/* Top — glyph */}
-            <div style={{ textAlign: "center" }}>
-              {card.celestial?.glyph && (
-                <div style={{ fontSize: "1.4rem", color: "var(--arcane)", lineHeight: 1 }}>
-                  {card.celestial.glyph}
-                </div>
-              )}
-            </div>
-
-            {/* Middle — card name */}
-            <div style={{ textAlign: "center" }}>
+          card.image ? (
+            /* ── Card image with overlay badges ── */
+            <div style={{ position: "relative", height: "100%", width: "100%" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={asset(card.image)}
+                alt={card.name}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  objectPosition: "center top",
+                  display: "block",
+                  transform: card.reversed ? "rotate(180deg)" : "none",
+                  transition: "transform 0.4s ease",
+                }}
+              />
+              {/* Name overlay at bottom */}
               <div style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "clamp(0.82rem, 1.6vw, 1.05rem)",
-                color: "var(--brass-bright)",
-                lineHeight: 1.25,
-                letterSpacing: "0.02em",
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                right: 0,
+                padding: "1.5rem 0.6rem 0.5rem",
+                background: "linear-gradient(to top, rgba(10,8,20,0.92) 0%, transparent 100%)",
+                textAlign: "center",
               }}>
-                {card.name}
-              </div>
-              {card.reversed && (
+                {card.celestial?.glyph && (
+                  <div style={{ fontSize: "1rem", color: "var(--arcane)", lineHeight: 1, marginBottom: "0.15rem" }}>
+                    {card.celestial.glyph}
+                  </div>
+                )}
                 <div style={{
-                  fontSize: "0.62rem",
-                  color: "var(--rose)",
-                  fontFamily: "var(--font-ui)",
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase",
-                  marginTop: "0.3rem",
+                  fontFamily: "var(--font-display)",
+                  fontSize: "clamp(0.78rem, 1.4vw, 0.98rem)",
+                  color: "var(--brass-bright)",
+                  lineHeight: 1.2,
+                  letterSpacing: "0.02em",
                 }}>
-                  ↺ Reversed
+                  {card.name}
                 </div>
-              )}
+                {card.reversed && (
+                  <div style={{
+                    fontSize: "0.6rem",
+                    color: "var(--rose)",
+                    fontFamily: "var(--font-ui)",
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    marginTop: "0.15rem",
+                  }}>
+                    ↺ Reversed
+                  </div>
+                )}
+              </div>
             </div>
-
-            {/* Bottom — meaning snippet */}
+          ) : (
+            /* ── Fallback text layout (no image) ── */
             <div style={{
-              fontSize: "clamp(0.68rem, 1.2vw, 0.78rem)",
-              color: "var(--ink-dim)",
-              fontFamily: "var(--font-body)",
-              lineHeight: 1.45,
-              textAlign: "center",
-              borderTop: "1px solid rgba(212,162,76,0.2)",
-              paddingTop: "0.5rem",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              padding: "0.85rem 0.75rem",
+              background: "linear-gradient(180deg, rgba(212,162,76,0.06) 0%, var(--bg-deep) 40%)",
             }}>
-              {(card.reversed ? card.reversedMeaning : card.upright).slice(0, 80)}
-              {(card.reversed ? card.reversedMeaning : card.upright).length > 80 ? "…" : ""}
+              {/* Top — glyph */}
+              <div style={{ textAlign: "center" }}>
+                {card.celestial?.glyph && (
+                  <div style={{ fontSize: "1.4rem", color: "var(--arcane)", lineHeight: 1 }}>
+                    {card.celestial.glyph}
+                  </div>
+                )}
+              </div>
+
+              {/* Middle — card name */}
+              <div style={{ textAlign: "center" }}>
+                <div style={{
+                  fontFamily: "var(--font-display)",
+                  fontSize: "clamp(0.82rem, 1.6vw, 1.05rem)",
+                  color: "var(--brass-bright)",
+                  lineHeight: 1.25,
+                  letterSpacing: "0.02em",
+                }}>
+                  {card.name}
+                </div>
+                {card.reversed && (
+                  <div style={{
+                    fontSize: "0.62rem",
+                    color: "var(--rose)",
+                    fontFamily: "var(--font-ui)",
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    marginTop: "0.3rem",
+                  }}>
+                    ↺ Reversed
+                  </div>
+                )}
+              </div>
+
+              {/* Bottom — meaning snippet */}
+              <div style={{
+                fontSize: "clamp(0.68rem, 1.2vw, 0.78rem)",
+                color: "var(--ink-dim)",
+                fontFamily: "var(--font-body)",
+                lineHeight: 1.45,
+                textAlign: "center",
+                borderTop: "1px solid rgba(212,162,76,0.2)",
+                paddingTop: "0.5rem",
+              }}>
+                {(card.reversed ? card.reversedMeaning : card.upright).slice(0, 80)}
+                {(card.reversed ? card.reversedMeaning : card.upright).length > 80 ? "…" : ""}
+              </div>
             </div>
-          </div>
+          )
         ) : (
           // eslint-disable-next-line @next/next/no-img-element
           <img
