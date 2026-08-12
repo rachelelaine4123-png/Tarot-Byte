@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Nav from "./components/Nav";
 import SpreadCard from "./components/SpreadCard";
+import LayerExplainer from "./components/LayerExplainer";
 import { SPREADS } from "@/lib/readingEngine";
 import { asset } from "@/lib/asset";
 
@@ -45,9 +46,9 @@ export default function Home() {
           Bite-sized wisdom<br />from the <span className="gold-text">cosmos</span>.
         </h1>
         <p className="muted" style={{ fontSize: "1.2rem", maxWidth: 620, margin: "0 auto 2rem", animation: "fadeUp 0.8s ease 0.1s both" }}>
-          TarotByte pairs the timeless 78-card tarot with an original,
-          astrology-powered <strong style={{ color: "var(--arcane)" }}>Astral Threads</strong> —
-          for readings that feel personal, clarifying, and a little bit magic.
+          Real tarot, read against the real sky. TarotByte takes the classic 78-card
+          deck and shows you the astrology already hidden inside every card — so your
+          reading gets specific instead of vague.
         </p>
         <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap", animation: "fadeUp 0.9s ease 0.15s both" }}>
           <Link href="/readings/yes-no" className="btn btn-lg">Try a free reading ✦</Link>
@@ -77,6 +78,12 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      <div className="container"><div className="divider" /></div>
+
+      {/* Newcomer orientation — explains the three layers before we ask
+          anyone to pick a spread or hand over an email. */}
+      <LayerExplainer />
 
       <div className="container"><div className="divider" /></div>
 

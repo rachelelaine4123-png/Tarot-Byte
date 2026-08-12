@@ -48,6 +48,11 @@ const DECAN_ADDON = {
   pack3Price: 5,
 };
 
+// All card art (tarot, oracle, decan) is rendered at 1024x1792 = 4/7.
+// Every card slot uses this so artwork is never cropped and every deck
+// renders at identical size and proportion.
+const CARD_ASPECT = "1024 / 1792";
+
 export default function Reading({ spreadId, locked = false }) {
   const spread = SPREADS[spreadId];
   const [question, setQuestion] = useState("");
@@ -55,6 +60,9 @@ export default function Reading({ spreadId, locked = false }) {
   const [tier, setTier] = useState("T");
   const [reading, setReading] = useState(null);
   const [phase, setPhase] = useState("idle"); // idle | shuffling | revealed
+  // Claude-generated interpretation: { cards:[{keywords,overview}], threadLine, synthesis }
+  const [interp, setInterp] = useState(null);
+  const [interpLoading, setInterpLoading] = useState(false);
 
   const account = useAccount();
   const loading = account.loading;
@@ -141,7 +149,10 @@ export default function Reading({ spreadId, locked = false }) {
       account.refresh();
       if (reading) {
         // Re-derive celestial lines on EXISTING cards — no redraw.
-        setReading(rederiveCelestialLines(reading, "D"));
+        const deeper = rederiveCelestialLines(reading, "D");
+        setReading(deeper);
+        // Re-interpret at the deeper tier so the narrative reflects the decans.
+        fetchInterpretation(deeper, question);
       } else {
         // No reading yet — draw fresh at D tier now.
         setPhase("shuffling");
@@ -150,6 +161,7 @@ export default function Reading({ spreadId, locked = false }) {
           setReading(result);
           setPhase("revealed");
           saveReading(result, spreadId, context, "D");
+          fetchInterpretation(result, question);
         }, 1300);
       }
       return;
@@ -158,9 +170,31 @@ export default function Reading({ spreadId, locked = false }) {
     startCheckout(PRICING.decan.memberSingle.priceId);
   }
 
+  // Ask Claude to interpret the drawn hand. Fail-soft: the API route always
+  // returns a usable payload (AI or templated fallback), so a failure here
+  // just leaves the reading without the enriched text.
+  async function fetchInterpretation(result, q) {
+    setInterpLoading(true);
+    setInterp(null);
+    try {
+      const res = await fetch("/api/interpret", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reading: result, question: q }),
+      });
+      const data = await res.json();
+      if (data && Array.isArray(data.cards)) setInterp(data);
+    } catch {
+      /* leave interp null — cards still render with their own meanings */
+    } finally {
+      setInterpLoading(false);
+    }
+  }
+
   function draw() {
     setPhase("shuffling");
     setReading(null);
+    setInterp(null);
     // Fallback ladder: D → needs decanUnlocked, Z → needs unlockLevel≥1, T always works
     const useTier = canUseTier(tier) ? tier
       : unlockLevel >= 1 ? "Z"
@@ -171,6 +205,7 @@ export default function Reading({ spreadId, locked = false }) {
       setPhase("revealed");
       // Fire-and-forget save — never blocks the UI
       saveReading(result, spreadId, context, useTier);
+      fetchInterpretation(result, question);
     }, 1300);
   }
 
@@ -223,13 +258,27 @@ export default function Reading({ spreadId, locked = false }) {
         <p className="muted" style={{ maxWidth: 460, margin: "0 auto 1.5rem" }}>
           {spread.description}
         </p>
-        <Link href="/signup" className="btn btn-lg">Sign up free to unlock →</Link>
+        <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center", flexWrap: "wrap" }}>
+          <Link href="/signup" className="btn btn-lg">Sign up free to unlock →</Link>
+          {/* Escape hatch: a curious newcomer who isn't ready to hand over an
+              email would otherwise dead-end here. */}
+          <Link href="/readings/past-present-future" className="btn btn-ghost btn-lg">
+            Try a free reading instead
+          </Link>
+        </div>
+        {/* Returning members land here signed-out with no way back in. */}
+        <p className="muted" style={{ fontFamily: "var(--font-ui)", fontSize: "0.88rem", marginTop: "1.25rem" }}>
+          Already have an account?{" "}
+          <Link href="/signin" style={{ color: "var(--brass-bright)", textDecoration: "underline", textUnderlineOffset: "2px" }}>
+            Sign in
+          </Link>
+        </p>
       </div>
     );
   }
 
   const cardCount = spread.cards + (spread.usesOracle ? 1 : 0);
-  const showThemeBanner = context && reading && phase === "revealed";
+
 
   return (
     <div>
@@ -333,12 +382,26 @@ export default function Reading({ spreadId, locked = false }) {
                 card={reading?.cards[i]}
                 shuffling={phase === "shuffling"}
                 delay={i * 150}
+                // When the Astral Threads card is drawn, every card in the
+                // spread carries the same blue halo — the thread runs through
+                // the whole reading, not just the oracle slot.
+                threaded={Boolean(reading?.oracle)}
               />
             ))}
             {spread.usesOracle && (
               <OracleSlot oracle={reading?.oracle} shuffling={phase === "shuffling"} delay={spread.cards * 150} />
             )}
           </div>
+
+          {/* One-line Astral Threads summary, directly beneath the cards */}
+          {reading?.oracle && phase === "revealed" && (interp?.threadLine || !interpLoading) && (
+            <div className="thread-line">
+              <span className="thread-sign">
+                ✦ Astral Thread · {reading.oracle.sign} · {reading.oracle.keyword}
+              </span>
+              {interp?.threadLine || reading.oracle.clarifier}
+            </div>
+          )}
 
           {/* Connector lines (visual) */}
           {reading && phase === "revealed" && (
@@ -370,6 +433,9 @@ export default function Reading({ spreadId, locked = false }) {
                       line={line}
                       card={card}
                       celestialLines={card?.celestialLines}
+                      detail={interp?.cards?.[i]}
+                      loading={interpLoading}
+                      threaded={Boolean(reading.oracle)}
                     />
                   );
                 })}
@@ -382,11 +448,25 @@ export default function Reading({ spreadId, locked = false }) {
           {/* Summary panel below the connected boxes */}
           {reading && phase === "revealed" && (
             <div className="panel" style={{ padding: "2rem", marginTop: "2rem" }}>
-              {/* Theme banner — single sentence at top, no per-card repetition */}
-              {showThemeBanner && (
-                <div className="theme-banner">
-                  <span className="theme-banner-label">✦ Your Focus</span>
-                  <p>This reading is held in the context of <strong className="gold-text">{context}</strong>. Every card below speaks to that theme — you don't need to weigh it separately for each position.</p>
+              {/* The synthesis — the detailed paragraph(s) tying the whole
+                  spread together. This replaces the old "Your Focus" banner,
+                  which restated the context without adding insight. */}
+              {(interp?.synthesis || interpLoading) && (
+                <div className="synthesis-box">
+                  <div className="synthesis-label">
+                    ✦ Your Reading{context ? ` · ${context}` : ""}
+                  </div>
+                  {interpLoading && !interp ? (
+                    <p className="interp-loading">Weaving the cards together…</p>
+                  ) : (
+                    // Split on any newline run — the model sometimes uses a
+                    // single \n between paragraphs.
+                    interp.synthesis
+                      .split(/\n+/)
+                      .map((p) => p.trim())
+                      .filter(Boolean)
+                      .map((para, i) => <p key={i}>{para}</p>)
+                  )}
                 </div>
               )}
 
@@ -449,13 +529,31 @@ export default function Reading({ spreadId, locked = false }) {
 }
 
 // --- Interpretation box that sits below each card, connected by a line ---
-function InterpBox({ line, card, celestialLines }) {
+// Each box shows: the position + card name, the top 3 keywords for how this
+// card lands in THIS reading, and a <=2 sentence contextual overview.
+// `detail` comes from Claude; if it hasn't arrived we fall back to the card's
+// own written meaning so the box is never empty.
+function InterpBox({ line, card, celestialLines, detail, loading, threaded }) {
+  const fallbackText = line.text.replace(/^[^.]*\.\s*/, "");
   return (
-    <div className="interp-box">
+    <div className={`interp-box${threaded ? " threaded" : ""}`}>
       <div className="interp-position">
         {line.position} — <span className="interp-card-name">{line.card}</span>
       </div>
-      <p className="interp-text">{line.text.replace(/^[^.]*\.\s*/, "")}</p>
+
+      {detail?.keywords?.length > 0 && (
+        <div className="kw-row">
+          {detail.keywords.map((k, i) => (
+            <span className="kw-chip" key={i}>{k}</span>
+          ))}
+        </div>
+      )}
+
+      {loading && !detail ? (
+        <p className="interp-loading">Reading the cards…</p>
+      ) : (
+        <p className="interp-text">{detail?.overview || fallbackText}</p>
+      )}
 
       {/* Astral Threads layers (Z / D) for this card */}
       {celestialLines?.map((cl, j) => (
@@ -549,9 +647,9 @@ function CelestialLine({ line }) {
             src={asset(line.image)}
             alt={line.title ? `Decan art: ${line.title}` : "Decan card art"}
             style={{
-              width: "180px", height: "auto", borderRadius: "10px",
+              width: "180px", aspectRatio: CARD_ASPECT, borderRadius: "10px",
               border: "1px solid var(--brass)", boxShadow: "var(--glow-brass)",
-              objectFit: "cover", display: "block",
+              objectFit: "contain", display: "block", background: "var(--bg-deep)",
             }}
           />
         </div>
@@ -653,12 +751,16 @@ const labelStyle = {
   textTransform: "uppercase", color: "var(--arcane)",
 };
 
-function CardSlot({ label, card, shuffling, delay }) {
+function CardSlot({ label, card, shuffling, delay, threaded = false }) {
   const revealed = card && !shuffling;
   return (
     <div style={{ textAlign: "center" }}>
-      <div style={{
-        aspectRatio: "2/3",
+      <div
+        className={revealed && threaded ? "astral-halo" : undefined}
+        style={{
+        // Matches the artwork's native 1024x1792 so the baked-in border and
+        // nameplate are never cropped by object-fit.
+        aspectRatio: CARD_ASPECT,
         borderRadius: "12px",
         overflow: "hidden",
         border: `1px solid ${revealed ? "var(--brass-bright)" : "var(--brass)"}`,
@@ -679,50 +781,40 @@ function CardSlot({ label, card, shuffling, delay }) {
                 style={{
                   width: "100%",
                   height: "100%",
-                  objectFit: "cover",
-                  objectPosition: "center top",
+                  // `contain` (not `cover`) so the full card art — including its
+                  // painted border and nameplate — is always visible intact.
+                  objectFit: "contain",
+                  objectPosition: "center",
                   display: "block",
                   transform: card.reversed ? "rotate(180deg)" : "none",
                   transition: "transform 0.4s ease",
                 }}
               />
-              {/* Name overlay at bottom */}
-              <div style={{
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                right: 0,
-                padding: "1.5rem 0.6rem 0.5rem",
-                background: "linear-gradient(to top, rgba(10,8,20,0.92) 0%, transparent 100%)",
-                textAlign: "center",
-              }}>
-                {card.celestial?.glyph && (
-                  <div style={{ fontSize: "1rem", color: "var(--arcane)", lineHeight: 1, marginBottom: "0.15rem" }}>
-                    {card.celestial.glyph}
-                  </div>
-                )}
+              {/* The artwork carries its own nameplate, so we only overlay the
+                  celestial glyph and the reversed flag. */}
+              {card.celestial?.glyph && (
                 <div style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: "clamp(0.78rem, 1.4vw, 0.98rem)",
-                  color: "var(--brass-bright)",
-                  lineHeight: 1.2,
-                  letterSpacing: "0.02em",
+                  position: "absolute", top: "0.5rem", right: "0.55rem",
+                  fontSize: "0.95rem", color: "var(--arcane)", lineHeight: 1,
+                  textShadow: "0 1px 6px rgba(0,0,0,0.9)",
                 }}>
-                  {card.name}
+                  {card.celestial.glyph}
                 </div>
-                {card.reversed && (
-                  <div style={{
-                    fontSize: "0.6rem",
-                    color: "var(--rose)",
-                    fontFamily: "var(--font-ui)",
-                    letterSpacing: "0.1em",
-                    textTransform: "uppercase",
-                    marginTop: "0.15rem",
-                  }}>
-                    ↺ Reversed
-                  </div>
-                )}
-              </div>
+              )}
+              {card.reversed && (
+                <div style={{
+                  position: "absolute", bottom: "0.4rem", left: 0, right: 0,
+                  fontSize: "0.6rem",
+                  color: "var(--rose)",
+                  fontFamily: "var(--font-ui)",
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  textAlign: "center",
+                  textShadow: "0 1px 6px rgba(0,0,0,0.95)",
+                }}>
+                  ↺ Reversed
+                </div>
+              )}
             </div>
           ) : (
             /* ── Fallback text layout (no image) ── */
@@ -792,7 +884,7 @@ function CardSlot({ label, card, shuffling, delay }) {
             style={{
               width: "100%",
               height: "100%",
-              objectFit: "cover",
+              objectFit: "contain",
               objectPosition: "center",
               display: "block",
             }}
@@ -817,8 +909,10 @@ function OracleSlot({ oracle, shuffling, delay }) {
   const revealed = oracle && !shuffling;
   return (
     <div style={{ textAlign: "center" }}>
-      <div style={{
-        aspectRatio: "2/3",
+      <div
+        className={revealed ? "astral-halo" : undefined}
+        style={{
+        aspectRatio: CARD_ASPECT,
         borderRadius: "12px",
         overflow: "hidden",
         border: "1px solid var(--arcane)",
@@ -835,8 +929,8 @@ function OracleSlot({ oracle, shuffling, delay }) {
             style={{
               width: "100%",
               height: "100%",
-              objectFit: "cover",
-              objectPosition: "center top",
+              objectFit: "contain",
+              objectPosition: "center",
               display: "block",
             }}
           />
@@ -849,7 +943,7 @@ function OracleSlot({ oracle, shuffling, delay }) {
             style={{
               width: "100%",
               height: "100%",
-              objectFit: "cover",
+              objectFit: "contain",
               objectPosition: "center",
               display: "block",
             }}
