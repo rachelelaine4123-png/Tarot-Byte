@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { generateReading, rederiveCelestialLines, SPREADS } from "@/lib/readingEngine";
 import { asset } from "@/lib/asset";
+import { backImageForTier, cardImageForTier } from "@/lib/deckArt";
 import { useAccount } from "@/lib/useAccount";
 import { PRICING } from "@/lib/stripeConfig";
 
@@ -386,6 +387,9 @@ export default function Reading({ spreadId, locked = false }) {
                 // spread carries the same blue halo — the thread runs through
                 // the whole reading, not just the oracle slot.
                 threaded={Boolean(reading?.oracle)}
+                // Drives which deck's art renders — T2 "harlectric" for the
+                // Astral Threads / Decan tiers, T1 otherwise.
+                tier={reading?.tier}
               />
             ))}
             {spread.usesOracle && (
@@ -751,8 +755,12 @@ const labelStyle = {
   textTransform: "uppercase", color: "var(--arcane)",
 };
 
-function CardSlot({ label, card, shuffling, delay, threaded = false }) {
+function CardSlot({ label, card, shuffling, delay, threaded = false, tier = "T" }) {
   const revealed = card && !shuffling;
+  // Which deck's art this slot shows. Resolved per-card because T2 only
+  // covers the majors — minors fall back to T1. See lib/deckArt.js.
+  const faceImage = cardImageForTier(card, tier);
+  const backImage = backImageForTier(tier);
   return (
     <div style={{ textAlign: "center" }}>
       <div
@@ -776,7 +784,7 @@ function CardSlot({ label, card, shuffling, delay, threaded = false }) {
             <div style={{ position: "relative", height: "100%", width: "100%" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={asset(card.image)}
+                src={asset(faceImage)}
                 alt={card.name}
                 style={{
                   width: "100%",
@@ -878,7 +886,7 @@ function CardSlot({ label, card, shuffling, delay, threaded = false }) {
         ) : (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={asset("/oracle/card-back.png")}
+            src={asset(backImage)}
             alt=""
             aria-hidden="true"
             style={{
