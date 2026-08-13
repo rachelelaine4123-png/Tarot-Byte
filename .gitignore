@@ -49,3 +49,8 @@ todo.md
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+incoming/
+
+# python
+__pycache__/
+*.pyc
