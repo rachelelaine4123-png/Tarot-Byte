@@ -8,7 +8,7 @@ import { asset } from "@/lib/asset";
 export const metadata = {
   title: "TarotByte — Free Tarot Readings with an Astral Twist",
   description:
-    "Free online tarot readings with an astrology-powered twist. Try Yes/No, Past·Present·Future, or your signature Energy Reading. Bite-sized wisdom from the cosmos.",
+    "Free online tarot readings with an astrology-powered twist. Try Yes/No, Past·Present·Future, or your signature Energy Reading. Byte-sized wisdom from the cosmos.",
   alternates: { canonical: "https://www.tarotbyte.app/" },
 };
 
@@ -43,16 +43,18 @@ export default function Home() {
       <header className="container" style={{ paddingTop: "3.5rem", paddingBottom: "2rem", textAlign: "center" }}>
         <div className="eyebrow" style={{ animation: "fadeUp 0.6s ease both" }}>Digital tarot · celestial insight · your energy, decoded</div>
         <h1 style={{ fontSize: "clamp(2.6rem, 6vw, 4.5rem)", margin: "1rem 0", animation: "fadeUp 0.7s ease 0.05s both" }}>
-          Bite-sized wisdom<br />from the <span className="gold-text">cosmos</span>.
+          <span className="gold-text">Byte</span>-sized wisdom<br />from the cosmos.
         </h1>
         <p className="muted" style={{ fontSize: "1.2rem", maxWidth: 620, margin: "0 auto 2rem", animation: "fadeUp 0.8s ease 0.1s both" }}>
           Real tarot, read against the real sky. TarotByte takes the classic 78-card
           deck and shows you the astrology already hidden inside every card — so your
           reading gets specific instead of vague.
         </p>
-        <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap", animation: "fadeUp 0.9s ease 0.15s both" }}>
-          <Link href="/readings/yes-no" className="btn btn-lg">Try a free reading ✦</Link>
-          <Link href="/signup" className="btn btn-ghost btn-lg">Unlock your Energy Reading</Link>
+        {/* One primary CTA, not two competing "free" buttons. It lands on
+            /readings, where people choose their own depth — the choice
+            LayerExplainer sets up right below the fold. */}
+        <div style={{ display: "flex", justifyContent: "center", animation: "fadeUp 0.9s ease 0.15s both" }}>
+          <Link href="/readings" className="btn btn-lg">Explore the readings ✦</Link>
         </div>
         <p className="muted" style={{ fontSize: "0.85rem", marginTop: "1.25rem", fontFamily: "var(--font-ui)" }}>
           Want the deepest layer? <Link href="/subscribe" style={{ color: "var(--brass-bright)", textDecoration: "underline", textUnderlineOffset: "2px" }}>See subscription plans →</Link>
@@ -105,10 +107,11 @@ export default function Home() {
         <div className="panel" style={{ padding: "2.5rem", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem", alignItems: "center" }}>
           <div>
             <div className="eyebrow">The TarotByte difference</div>
-            <h2 style={{ fontSize: "2rem", margin: "0.5rem 0 1rem" }}>The <span className="gold-text">Astral Threads</span> — ours alone</h2>
+            <h2 style={{ fontSize: "2rem", margin: "0.5rem 0 1rem" }}>The <span className="gold-text">Astral Threads</span> — your decoded message from the stars</h2>
             <p className="muted" style={{ marginBottom: "1rem" }}>
-              Most tarot sites stop at the cards. TarotByte layers in the <strong style={{ color: "var(--arcane)" }}>Astral Threads</strong> —
-              an original 12-sign celestial deck that clarifies the energy behind every reading.
+              We didn&apos;t reinvent the wheel — astrology and tarot have been speaking to
+              each other for centuries. We just put it to work. The <strong style={{ color: "var(--arcane)" }}>Astral Threads</strong> is
+              an original 12-sign celestial deck that translates the sky into plain language, right alongside every reading.
             </p>
             <p className="muted">
               It powers our signature <strong style={{ color: "var(--brass-bright)" }}>Energy Reading</strong>:
