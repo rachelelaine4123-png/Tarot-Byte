@@ -11,7 +11,7 @@ export default function OraclePage() {
       <Nav />
       <main className="container" style={{ paddingTop: "2.5rem", paddingBottom: "4rem" }}>
         <div style={{ textAlign: "center", marginBottom: "2.5rem", maxWidth: 640, margin: "0 auto 2.5rem" }}>
-          <div className="eyebrow">Original · astrology-powered · ours alone</div>
+          <div className="eyebrow">Original · astrology-powered · decoded from the stars</div>
           <h1 style={{ fontSize: "2.8rem", marginTop: "0.5rem" }}>The <span className="gold-text">Astral Threads</span></h1>
           <p className="muted" style={{ marginTop: "0.75rem" }}>
             Twelve celestial energies — one for each sign of the zodiac — hand-crafted for TarotByte.

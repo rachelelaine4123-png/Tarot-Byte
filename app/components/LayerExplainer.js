@@ -53,14 +53,15 @@ export default function LayerExplainer() {
       <div style={{ textAlign: "center", marginBottom: "2.25rem" }}>
         <div className="eyebrow">New here? Start with this</div>
         <h2 style={{ fontSize: "clamp(1.9rem, 4vw, 2.4rem)", marginTop: "0.5rem" }}>
-          One deck. <span className="gold-text">Three layers</span> of depth.
+          Three decks. <span className="gold-text">Three layers</span> of depth.
         </h2>
         <p
           className="muted"
           style={{ maxWidth: 620, margin: "0.9rem auto 0", fontSize: "1.03rem" }}
         >
-          Every reading uses the same 78 cards. What changes is how much of the sky
-          you can see behind them. Start free — go deeper whenever you want.
+          Every reading draws from the same 78 cards, but each layer reveals its own
+          deck and its own depth of sky behind them. Start free — go deeper whenever
+          you want.
         </p>
       </div>
 

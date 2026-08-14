@@ -52,10 +52,18 @@ async function run() {
       `(got ${data.cards?.length} vs ${reading.cards.length})`);
     check("every card has 1-3 keywords",
       data.cards?.every((c) => c.keywords.length >= 1 && c.keywords.length <= 3));
-    check("every overview <= 2 sentences",
-      data.cards?.every((c) => (c.overview.match(/[.!?]+/g) || []).length <= 2),
+    // Overviews are now colloquial and card-weight-dependent (~2-4 sentences
+    // typically), not hard-capped at 2 — just sanity-check they're not empty
+    // and not runaway-long.
+    check("every overview is 1-6 sentences",
+      data.cards?.every((c) => {
+        const n = (c.overview.match(/[.!?]+/g) || []).length;
+        return n >= 1 && n <= 6;
+      }),
       `(counts: ${data.cards?.map((c) => (c.overview.match(/[.!?]+/g) || []).length).join(",")})`);
-    check("synthesis is substantial", (data.synthesis?.length || 0) > 200,
+    // Synthesis should run noticeably longer now that it's meant to be the
+    // payoff of the reading, not a one-liner recap.
+    check("synthesis is substantial", (data.synthesis?.length || 0) > 350,
       `(len ${data.synthesis?.length})`);
     if (reading.oracle) {
       check("threadLine present when oracle drawn", !!data.threadLine);

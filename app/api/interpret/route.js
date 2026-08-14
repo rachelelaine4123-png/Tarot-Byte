@@ -15,8 +15,11 @@ import {
 
 // Overridable via env so the model can be upgraded without a code change.
 const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-5-20250929";
-const MAX_TOKENS = 1600;
-const TIMEOUT_MS = 20000;
+// Bumped alongside the longer, more colloquial interpretation prompt: overviews
+// and synthesis now run longer by design, so the old 1600/20s budget was
+// clipping or timing out multi-card spreads and silently falling back.
+const MAX_TOKENS = 2400;
+const TIMEOUT_MS = 30000;
 
 export async function POST(request) {
   let body;

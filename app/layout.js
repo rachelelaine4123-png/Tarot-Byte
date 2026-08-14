@@ -8,7 +8,7 @@ export const metadata = {
     template: "%s — TarotByte",
   },
   description:
-    "Free tarot readings, an original astrology-powered Astral Threads deck, and your signature Energy Reading. Bite-sized wisdom for the modern seeker.",
+    "Free tarot readings, an original astrology-powered Astral Threads deck, and your signature Energy Reading. Byte-sized wisdom for the modern seeker.",
   keywords: [
     "tarot", "free tarot reading", "online tarot", "astrology tarot",
     "decan", "zodiac tarot", "celestial tarot", "astral threads",
@@ -28,7 +28,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "TarotByte — Digital Tarot with an Astral Twist",
     description:
-      "Free tarot readings with an astral twist. Bite-sized wisdom for the modern seeker.",
+      "Free tarot readings with an astral twist. Byte-sized wisdom for the modern seeker.",
   },
   robots: {
     index: true,

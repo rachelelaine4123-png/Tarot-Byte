@@ -3,7 +3,7 @@ import Link from "next/link";
 export const metadata = {
   title: "How TarotByte Reads — The Guide",
   description:
-    "Understand TarotByte's two dimensions, three reading layers, the Archons, the Suits, the Astral Threads, and the Decan Engine.",
+    "Understand TarotByte's two dimensions, three reading layers, the Major Arcana, the Suits, the Astral Threads, and the Decan Engine.",
 };
 
 export default function GuidePage() {
@@ -28,9 +28,9 @@ export default function GuidePage() {
           match the celestial theme:
         </p>
         <div className="guide-callout">
-          <p><strong className="gold-text">The Archons</strong> — what most decks call the Major Arcana. These
-          are the 22 governing forces: fate, archetype, the big energies acting on you. When an Archon shows
-          up, something larger than daily life is in motion.</p>
+          <p><strong className="gold-text">The Major Arcana</strong> — the 22 governing forces: fate,
+          archetype, the big energies acting on you. When a Major shows up, something larger than daily
+          life is in motion.</p>
           <p><strong className="gold-text">The Suits</strong> — the Minor Arcana. These are the 56 cards of
           everyday choices: Wands (Fire, will), Cups (Water, feeling), Swords (Air, mind), and Pentacles
           (Earth, resource). They describe the texture of your day-to-day situation.</p>
@@ -72,8 +72,8 @@ export default function GuidePage() {
         <ul className="guide-list">
           <li><strong className="gold-text">Aces</strong> → the pure, undivided element itself (source energy).
           The Ace of Wands is all of Fire — Aries, Leo, and Sagittarius at once.</li>
-          <li><strong className="gold-text">Archons</strong> → a whole planet or sign. They're fate-level
-          forces, so they read as the full ruling body rather than one slice of it.</li>
+          <li><strong className="gold-text">Major Arcana</strong> → a whole planet or sign. They're
+          fate-level forces, so they read as the full ruling body rather than one slice of it.</li>
           <li><strong className="gold-text">Court cards</strong> → a persona straddling a cusp between two
           signs. The reading describes the tension and blend of both energies.</li>
           <li><strong className="gold-text">Pips 2–10</strong> → resolve to a <em>precise</em> decan. This is
@@ -104,8 +104,9 @@ export default function GuidePage() {
       <Section title="Astral Weather">
         <p>
           At the bottom of your reading you'll sometimes see an <strong className="gold-text">Astral
-          Weather</strong> line. This is a reading-level summary of the overall balance — how many Archons
-          (fate) versus Suits (choices) versus Aces (source) versus Courts (personas) appeared in your draw.
+          Weather</strong> line. This is a reading-level summary of the overall balance — how many Major
+          Arcana (fate) versus Suits (choices) versus Aces (source) versus Courts (personas) appeared in
+          your draw.
         </p>
         <p>
           It's a quick way to sense the "temperature" of the reading: a fate-heavy spread feels different from
