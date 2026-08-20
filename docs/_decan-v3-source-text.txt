@@ -1,0 +1,57 @@
+[1] TarotByte — The Decan Engine: Full Coverage (42 cards)
+[3] Aces | Majors | Courts — same deck, same style, no forced decan
+[7] HOW TO USE THIS
+[9] Your Master Style Block + moodboard already define the house style — same ornate gold-filigree border, cosmic navy sky, painterly full-scene illustration as the existing 36 decan cards. Nothing below changes that. This doc is just the per-card content: what each card's TRUE correspondence is (Golden Dawn, already defined in code — nothing invented), an original TarotByte name, and a one-line high-level scene prompt to generate from.
+[11] No rings, no watcher figures, no diagram overlays — just the card's own energy, rendered the same way the 36 decans already are. These 42 complete the deck to 78/78 so every card — Aces, Majors, Courts included — has real "Decan Engine" depth art with zero invented/contradictory astrology.
+[13] File naming (matches the existing /decan-cards/ routing): save as <card-id>.png — e.g. the-empress.png, ace-of-cups.png, queen-of-swords.png — same convention as the 36 pip files already in public/decan-cards/.
+[17] PART ONE: THE 22 MAJORS
+[19] (Fate-tier — each rules a whole planet, sign, or element)
+[21] The Fool | Element: Air | SCENE | a lone traveler stepping off a cliff's edge into open sky at dawn, a small dog at their heel, wind lifting a light pack, endless pale clouds below, sense of weightless beginning.
+[23] The Magician | Planet: Mercury | SCENE | a figure at an altar with wand raised skyward and hand pointing to earth, tools of all four suits laid before them, quicksilver light crackling between hand and sky, sense of will made real.
+[25] The High Priestess | Planet: Moon | SCENE | a veiled figure seated between two pillars of black and white, a crescent moon at her feet, a scroll half-hidden in her lap, still water reflecting starlight behind her, sense of hidden knowing.
+[27] The Empress | Planet: Venus | SCENE | a crowned figure reclining in an overflowing garden of wheat and roses, a stream running beside her, doves overhead, golden abundance and soft fertility, sense of nurturing plenty.
+[29] The Emperor | Sign: Aries | SCENE | a armored ruler enthroned before a stark mountain range, ram-head finials on the throne, a globe held firm in one hand, sense of unshakable structure and command.
+[31] The Hierophant | Sign: Taurus | SCENE | a robed teacher enthroned between two pillars, two acolytes kneeling before him, crossed keys at his feet, warm candlelight, sense of tradition and grounded belief.
+[33] The Lovers | Sign: Gemini | SCENE | two figures standing beneath a radiant winged presence overhead, a tree of flame and a tree of fruit behind them, a mountain path between, sense of a values-based choice made in unity.
+[35] The Chariot | Sign: Cancer | SCENE | an armored figure driving a chariot pulled by two sphinxes, one black one white, crescent moons on the shoulders, a walled city receding behind, sense of willpower steering opposing forces.
+[37] Strength | Sign: Leo | SCENE | a serene figure gently closing a lion's jaw with bare hands, an infinity symbol glowing overhead, soft dawn light on a hillside, sense of quiet mastery over instinct.
+[39] The Hermit | Sign: Virgo | SCENE | a cloaked elder standing on a snowy peak holding a lantern with a single bright star inside, staff in hand, path winding down into darkness below, sense of solitary inner guidance.
+[41] Wheel of Fortune | Planet: Jupiter | SCENE | a great turning wheel suspended in a stormy sky, ancient symbols carved into its rim, a sphinx atop it, creatures rising and falling at its edges, sense of fated cycles in motion.
+[43] Justice | Sign: Libra | SCENE | a crowned figure enthroned between two grey pillars, a raised sword in one hand and a balanced scale in the other, level unwavering gaze, sense of truth weighed exactly.
+[45] The Hanged Man | Element: Water | SCENE | a figure suspended upside down from a living tree by one foot, calm luminous expression, a faint halo of light around the head, still water below reflecting the scene, sense of surrender revealing new sight.
+[47] Death | Sign: Scorpio | SCENE | an armored skeletal rider on a pale horse moving slowly through a field at dawn, a fallen banner and a rising sun on the horizon, figures parting before it without fear, sense of necessary ending making room for renewal.
+[49] Temperance | Sign: Sagittarius | SCENE | a winged figure with one foot on land and one in a stream, pouring liquid light between two cups in a continuous arc, a path rising toward distant mountains, sense of patient alchemical balance.
+[51] The Devil | Sign: Capricorn | SCENE | a horned figure enthroned above two chained but loosely bound figures, torches burning at the base, dark stone cavern, sense of self-made bondage that could be released.
+[53] The Tower | Planet: Mars | SCENE | a lightning-struck tower crumbling against a black sky, two figures falling clear of the wreckage, a crown knocked loose mid-air, sense of sudden clarifying upheaval.
+[55] The Star | Sign: Aquarius | SCENE | a kneeling woman pouring water from two vessels into a pool and onto the earth beneath a sky of one great star and seven small ones, calm night, sense of quiet renewed hope.
+[57] The Moon | Sign: Pisces | SCENE | a winding path between two towers leading toward distant hills, a wolf and a dog howling below a full moon, a crayfish emerging from a dark pool, sense of intuition navigating the unseen.
+[59] The Sun | Planet: Sun | SCENE | a joyful child on a white horse beneath a wide radiant sun, sunflowers lining a low garden wall, banner streaming, warm golden light everywhere, sense of pure vitality and success.
+[61] Judgement | Element: Fire | SCENE | an angel sounding a great trumpet above rising figures with arms lifted from open graves, dawn light breaking over distant peaks, sense of an awakening call answered.
+[63] The World | Planet: Saturn | SCENE | a dancing figure wreathed in a great laurel oval, the four living creatures of the elements in each corner of the sky, sense of a completed cycle held in graceful wholeness.
+[67] PART TWO: THE 4 ACES
+[69] (Source-tier — each is the whole undivided element, bigger than any single decan)
+[71] Ace of Wands | Element: Fire | Signs | Aries/Leo/Sagittarius
+[73] Ace of Cups | Element: Water | Signs | Cancer/Scorpio/Pisces
+[75] Ace of Swords | Element: Air | Signs | Libra/Aquarius/Gemini
+[77] Ace of Pentacles | Element: Earth | Signs | Capricorn/Taurus/Virgo
+[81] PART THREE: THE 16 COURTS
+[83] (Persona-tier — each straddles a cusp of two signs, or carries the whole element for Pages)
+[85] Knight of Wands | Cusp: Scorpio–Sagittarius | SCENE | an armored rider on a rearing horse charging across a desert at full gallop, salamanders on his tunic, sparks flying from the horse's hooves, sense of bold impulsive momentum.
+[87] Queen of Wands | Cusp: Pisces–Aries | SCENE | a confident queen enthroned with a sunflower and a black cat at her feet, warm firelight behind her throne, wand held upright, sense of magnetic, self-assured warmth.
+[89] King of Wands | Cusp: Cancer–Leo | SCENE | a commanding king enthroned before a desert horizon, salamander carvings on his throne, wand held with quiet authority, lion emblems on his robe, sense of visionary charismatic mastery.
+[91] Page of Wands | Element: Fire (Aries–Leo–Sagittarius) | SCENE | a young figure in a desert landscape holding a sprouting wand aloft, pyramids in the distance, feather in cap catching the wind, sense of eager, curious new fire.
+[93] Knight of Cups | Cusp: Aquarius–Pisces | SCENE | an armored rider in winged helm moving slowly along a quiet riverbank, holding a chalice out before him, calm reflective water, sense of romantic idealism in motion.
+[95] Queen of Cups | Cusp: Gemini–Cancer | SCENE | a queen seated at the edge of the sea holding an ornate closed chalice, gentle waves lapping at her throne, dreamy moonlit water, sense of deep intuitive compassion.
+[97] King of Cups | Cusp: Libra–Scorpio | SCENE | a calm king enthroned on a floating stone amid turbulent seas, holding a cup and scepter steady despite the waves, a ship rocking safely in the distance, sense of emotional mastery amid chaos.
+[99] Page of Cups | Element: Water (Cancer–Scorpio–Pisces) | SCENE | a young figure at the shoreline holding a chalice from which a fish emerges in surprise, gentle waves, soft light, sense of tender imaginative discovery.
+[101] Knight of Swords | Cusp: Taurus–Gemini | SCENE | an armored rider charging headlong into a storm wind, sword raised, birds scattering, banners whipping, sense of fast relentless focus.
+[103] Queen of Swords | Cusp: Virgo–Libra | SCENE | a queen enthroned among high clouds, sword upright, one hand raised as if weighing a truth, sharp clear light, sense of clear-eyed honest wisdom.
+[105] King of Swords | Cusp: Capricorn–Aquarius | SCENE | a king enthroned high above a windswept sky, sword held perfectly upright, twin crescent carvings on the throne, sense of impartial intellectual authority.
+[107] Page of Swords | Element: Air (Libra–Aquarius–Gemini) | SCENE | a young figure atop a windy hill gripping an upright sword, storm clouds rushing past, alert stance, sense of sharp curious readiness.
+[109] Knight of Pentacles | Cusp: Leo–Virgo | SCENE | an armored rider seated still on a solid dark horse in a freshly plowed field, coin held steady in hand, harvest light, sense of patient, reliable progress.
+[111] Queen of Pentacles | Cusp: Sagittarius–Capricorn | SCENE | a queen enthroned in a flowering garden holding a coin like a child, a rabbit at her feet, lush abundant greenery, sense of grounded nurturing wealth.
+[113] King of Pentacles | Cusp: Aries–Taurus | SCENE | a king enthroned amid vineyards and a distant castle, coin resting in his lap, bull carvings on the throne, sense of prosperous, dependable mastery.
+[115] Page of Pentacles | Element: Earth (Capricorn–Taurus–Virgo) | SCENE | a young figure standing in a green field studying a single coin held up with both hands, distant plowed hills, sense of earnest practical promise.
+[119] NAMING NOTE
+[121] Each of these 42 cards should get an original TarotByte title (ownable IP), the same way the 36 decans already have names like "The Golden Return" or "The Clear- Eyed Choice" — short, evocative, action/insight-oriented, 2–4 words. Suggest generating these alongside the art, or drop me a note and I'll draft a full naming pass (title + one-line meaning, matching DECAN_TITLE / DECAN_MEANING voice) once art is underway.
+[123] Each of these 42 cards should get an original TarotByte title (ownable IP), the same way the 36 decans already have names like "The Golden Return" or "The Clear- Eyed Choice" — short, evocative, action/insight-oriented, 2–4 words. Suggest generating these alongside the art, or drop me a note and I'll draft a full naming pass (title + one-line meaning, matching DECAN_TITLE / DECAN_MEANING voice) once art is underway.

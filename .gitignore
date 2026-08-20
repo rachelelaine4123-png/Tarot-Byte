@@ -54,3 +54,6 @@ incoming/
 # python
 __pycache__/
 *.pyc
+
+# large incoming art staging (46MB) — never commit
+_incoming-art-42/
